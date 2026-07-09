@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<!-- saved from url=(0053)file:///C:/Users/admin/Desktop/inventory-tracker.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Supply Room — Inventory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="./Supply Room — Inventory_files/css2" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F4EF;
+    --ink:#22281F;
+    --ink-soft:#5B6356;
+    --line:#DCD7C9;
+    --slate:#3D5A52;
+    --slate-deep:#28403A;
+    --amber:#C97A3C;
+    --amber-soft:#F1DCC4;
+    --ok:#5C7A52;
+    --ok-soft:#E2EAD8;
+    --card:#FFFFFF;
+    --shadow: 0 10px 30px -12px rgba(34,40,31,0.18);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:48px 28px 100px;}
+
+  /* header */
+  .top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;gap:20px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--slate);margin:0 0 6px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:560;
+    font-size:42px;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--ink-soft);font-size:14.5px;margin-top:8px;max-width:46ch;line-height:1.5;}
+
+  .add-btn{
+    font-family:'Inter',sans-serif;
+    background:var(--slate-deep);
+    color:#fff;border:none;border-radius:10px;
+    padding:13px 20px;font-size:14px;font-weight:600;
+    cursor:pointer;white-space:nowrap;
+    display:flex;align-items:center;gap:8px;
+    transition:transform .18s ease, background .18s ease;
+  }
+  .add-btn:hover{background:var(--slate);transform:translateY(-1px);}
+  .add-btn:active{transform:translateY(0);}
+  .add-btn svg{width:15px;height:15px;}
+
+  /* stats strip */
+  .stats{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    margin:32px 0 36px;
+  }
+  .stat{background:var(--card);padding:18px 20px;}
+  .stat .n{font-family:'Fraunces',serif;font-size:28px;font-weight:560;line-height:1;}
+  .stat .l{font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.02em;}
+  .stat.low .n{color:var(--amber);}
+
+  /* table */
+  .list-head{
+    display:grid;grid-template-columns:2.4fr 1fr 1.4fr 1.1fr 70px;
+    padding:0 18px 10px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  #rows{display:flex;flex-direction:column;gap:8px;}
+  .row{
+    display:grid;grid-template-columns:2.4fr 1fr 1.4fr 1.1fr 70px;
+    align-items:center;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 18px;
+    transition: box-shadow .2s ease, border-color .2s ease;
+    animation: riseIn .42s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .row:hover{box-shadow:var(--shadow);border-color:#cfc8b5;cursor:pointer;}
+  @keyframes riseIn{
+    from{opacity:0; transform:translateY(10px) scale(.99);}
+    to{opacity:1; transform:translateY(0) scale(1);}
+  }
+  .row.leaving{
+    animation: fadeOut .28s ease forwards;
+  }
+  @keyframes fadeOut{
+    to{opacity:0; transform:translateX(14px) scale(.97); margin-top:-66px;}
+  }
+
+  .item-name{font-weight:600;font-size:14.5px;}
+  .item-loc{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .cat-pill{
+    font-size:11px;font-weight:600;color:var(--slate);
+    background:#EAF0EB;border-radius:999px;padding:4px 10px;
+    width:fit-content;
+  }
+
+  .gauge-wrap{display:flex;flex-direction:column;gap:5px;}
+  .gauge-num{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:var(--ink);}
+  .gauge{height:6px;border-radius:4px;background:var(--line);overflow:hidden;}
+  .gauge-fill{
+    height:100%;border-radius:4px;background:var(--ok);
+    width:0%;
+    transition: width .7s cubic-bezier(.2,.8,.2,1), background .4s ease;
+  }
+  .gauge-fill.low{background:var(--amber);}
+
+  .status{
+    font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;
+    width:fit-content;display:flex;align-items:center;gap:6px;
+  }
+  .status.ok{background:var(--ok-soft);color:#3C5635;}
+  .status.low{background:var(--amber-soft);color:#8A4E1F;}
+  .status .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .status.low .dot{animation:pulse 1.5s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+  .row-actions{display:flex;justify-content:flex-end;}
+  .edit-dot{
+    width:30px;height:30px;border-radius:8px;border:1px solid var(--line);
+    background:transparent;display:flex;align-items:center;justify-content:center;
+    color:var(--ink-soft);cursor:pointer;transition:.15s ease;
+  }
+  .edit-dot:hover{background:var(--slate-deep);color:#fff;border-color:var(--slate-deep);}
+  .edit-dot svg{width:14px;height:14px;}
+
+  .empty{
+    text-align:center;padding:60px 20px;color:var(--ink-soft);
+    font-size:14px;border:1px dashed var(--line);border-radius:14px;
+  }
+
+  /* overlay + panel */
+  .overlay{
+    position:fixed;inset:0;background:rgba(34,40,31,0.32);
+    opacity:0;pointer-events:none;transition:opacity .25s ease;
+    z-index:30;
+  }
+  .overlay.show{opacity:1;pointer-events:auto;}
+
+  .panel{
+    position:fixed;top:0;right:0;height:100%;width:min(420px,92vw);
+    background:var(--paper);
+    border-left:1px solid var(--line);
+    box-shadow:-20px 0 50px -20px rgba(0,0,0,0.25);
+    transform:translateX(100%);
+    transition:transform .38s cubic-bezier(.2,.8,.2,1);
+    z-index:31;
+    display:flex;flex-direction:column;
+  }
+  .panel.show{transform:translateX(0);}
+
+  .panel-head{
+    padding:26px 26px 18px;border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:flex-start;
+  }
+  .panel-head h2{
+    font-family:'Fraunces',serif;font-weight:560;font-size:24px;margin:0 0 4px;
+  }
+  .panel-head p{margin:0;font-size:13px;color:var(--ink-soft);}
+  .close-btn{
+    background:none;border:none;color:var(--ink-soft);cursor:pointer;
+    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+    border-radius:8px;transition:.15s;
+  }
+  .close-btn:hover{background:var(--line);color:var(--ink);}
+
+  form{padding:24px 26px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;flex:1;}
+  .field label{
+    display:block;font-size:12px;font-weight:600;color:var(--ink-soft);
+    margin-bottom:7px;letter-spacing:.01em;
+  }
+  .field input, .field select{
+    width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;
+    font-family:'Inter',sans-serif;font-size:14px;background:#fff;color:var(--ink);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .field input:focus, .field select:focus{
+    outline:none;border-color:var(--slate);box-shadow:0 0 0 3px rgba(61,90,82,0.14);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+  .panel-foot{
+    padding:18px 26px 26px;border-top:1px solid var(--line);
+    display:flex;gap:10px;
+  }
+  .btn{
+    flex:1;padding:13px;border-radius:9px;font-size:14px;font-weight:600;
+    cursor:pointer;border:1px solid transparent;transition:.15s ease;
+    font-family:'Inter',sans-serif;
+  }
+  .btn-primary{background:var(--slate-deep);color:#fff;}
+  .btn-primary:hover{background:var(--slate);}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border-color:var(--line);}
+  .btn-ghost:hover{background:#fff;color:var(--ink);}
+  .btn-danger{background:transparent;color:#A14B2A;border-color:#E9C9B4;}
+  .btn-danger:hover{background:#FBEEE5;}
+
+  @media (max-width:640px){
+    .top{flex-direction:column;align-items:flex-start;}
+    .add-btn{width:100%;justify-content:center;}
+    .stats{grid-template-columns:1fr;}
+    .list-head{display:none;}
+    .row{grid-template-columns:1fr auto;grid-template-areas:"name actions" "gauge gauge" "status cat";row-gap:8px;}
+    .item-name-cell{grid-area:name;}
+    .gauge-wrap{grid-area:gauge;}
+    .row-actions{grid-area:actions;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <p class="eyebrow">3rd floor · supply room</p>
+      <h1>Office Inventory</h1>
+      <p class="sub">What's on the shelf, what's running low, and where to find it.</p>
+    </div>
+    <button class="add-btn" id="openAdd">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Add item
+    </button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="statTotal">6</div><div class="l">items tracked</div></div>
+    <div class="stat low"><div class="n" id="statLow">3</div><div class="l">running low</div></div>
+    <div class="stat"><div class="n" id="statCats">6</div><div class="l">categories</div></div>
+  </div>
+
+  <div class="list-head">
+    <div>Item</div><div>Category</div><div>Stock</div><div>Status</div><div></div>
+  </div>
+  <div id="rows"><div class="row" data-id="1" style="animation-delay: 0ms;">
+      <div class="item-name-cell">
+        <div class="item-name">A4 Paper, 80gsm</div>
+        <div class="item-loc">Shelf B2</div>
+      </div>
+      <div><span class="cat-pill">Paper &amp; Print</span></div>
+      <div class="gauge-wrap">
+        <span class="gauge-num">23% in stock</span>
+        <div class="gauge"><div class="gauge-fill low" data-target="23" style="width: 23%;"></div></div>
+      </div>
+      <div>
+        <span class="status low"><span class="dot"></span>Reorder</span>
+      </div>
+      <div class="row-actions">
+        <button class="edit-dot" title="Edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </button>
+      </div>
+    </div><div class="row" data-id="2" style="animation-delay: 35ms;">
+      <div class="item-name-cell">
+        <div class="item-name">Black Ballpoint Pens (box)</div>
+        <div class="item-loc">Drawer A1</div>
+      </div>
+      <div><span class="cat-pill">Writing</span></div>
+      <div class="gauge-wrap">
+        <span class="gauge-num">64% in stock</span>
+        <div class="gauge"><div class="gauge-fill " data-target="64" style="width: 64%;"></div></div>
+      </div>
+      <div>
+        <span class="status ok"><span class="dot"></span>Stocked</span>
+      </div>
+      <div class="row-actions">
+        <button class="edit-dot" title="Edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </button>
+      </div>
+    </div><div class="row" data-id="3" style="animation-delay: 70ms;">
+      <div class="item-name-cell">
+        <div class="item-name">Ground Coffee, 1kg</div>
+        <div class="item-loc">Pantry</div>
+      </div>
+      <div><span class="cat-pill">Kitchen</span></div>
+      <div class="gauge-wrap">
+        <span class="gauge-num">18% in stock</span>
+        <div class="gauge"><div class="gauge-fill low" data-target="18" style="width: 18%;"></div></div>
+      </div>
+      <div>
+        <span class="status low"><span class="dot"></span>Reorder</span>
+      </div>
+      <div class="row-actions">
+        <button class="edit-dot" title="Edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </button>
+      </div>
+    </div><div class="row" data-id="4" style="animation-delay: 105ms;">
+      <div class="item-name-cell">
+        <div class="item-name">Disinfectant Wipes</div>
+        <div class="item-loc">Cleaning Closet</div>
+      </div>
+      <div><span class="cat-pill">Cleaning</span></div>
+      <div class="gauge-wrap">
+        <span class="gauge-num">60% in stock</span>
+        <div class="gauge"><div class="gauge-fill " data-target="60" style="width: 60%;"></div></div>
+      </div>
+      <div>
+        <span class="status ok"><span class="dot"></span>Stocked</span>
+      </div>
+      <div class="row-actions">
+        <button class="edit-dot" title="Edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </button>
+      </div>
+    </div><div class="row" data-id="5" style="animation-delay: 140ms;">
+      <div class="item-name-cell">
+        <div class="item-name">USB-C Cables</div>
+        <div class="item-loc">IT Cabinet</div>
+      </div>
+      <div><span class="cat-pill">Tech</span></div>
+      <div class="gauge-wrap">
+        <span class="gauge-num">24% in stock</span>
+        <div class="gauge"><div class="gauge-fill low" data-target="24" style="width: 24%;"></div></div>
+      </div>
+      <div>
+        <span class="status low"><span class="dot"></span>Reorder</span>
+      </div>
+      <div class="row-actions">
+        <button class="edit-dot" title="Edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </button>
+      </div>
+    </div><div class="row" data-id="6" style="animation-delay: 175ms;">
+      <div class="item-name-cell">
+        <div class="item-name">Padded Mailers, Medium</div>
+        <div class="item-loc">Shelf C1</div>
+      </div>
+      <div><span class="cat-pill">Mailing</span></div>
+      <div class="gauge-wrap">
+        <span class="gauge-num">50% in stock</span>
+        <div class="gauge"><div class="gauge-fill " data-target="50" style="width: 50%;"></div></div>
+      </div>
+      <div>
+        <span class="status ok"><span class="dot"></span>Stocked</span>
+      </div>
+      <div class="row-actions">
+        <button class="edit-dot" title="Edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+        </button>
+      </div>
+    </div></div>
+  <div class="empty" id="emptyState" style="display:none;">No items yet — add your first one.</div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <div>
+      <h2 id="panelTitle">Add item</h2>
+      <p id="panelSub">New entry for the supply room</p>
+    </div>
+    <button class="close-btn" id="closePanel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+    </button>
+  </div>
+  <form id="itemForm">
+    <div class="field">
+      <label for="f-name">Item name</label>
+      <input id="f-name" required="" placeholder="e.g. A4 Paper, 80gsm">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="f-cat">Category</label>
+        <select id="f-cat">
+          <option>Paper &amp; Print</option>
+          <option>Writing</option>
+          <option>Kitchen</option>
+          <option>Cleaning</option>
+          <option>Tech</option>
+          <option>Mailing</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-loc">Location</label>
+        <input id="f-loc" required="" placeholder="e.g. Shelf B2">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="f-qty">Stock level (%)</label>
+        <input id="f-qty" type="number" min="0" max="100" required="" placeholder="0">
+      </div>
+      <div class="field">
+        <label for="f-min">Reorder threshold (%)</label>
+        <input id="f-min" type="number" min="0" max="100" required="" placeholder="0">
+      </div>
+    </div>
+  </form>
+  <div class="panel-foot">
+    <button class="btn btn-danger" id="deleteBtn" style="display:none;">Remove</button>
+    <button class="btn btn-ghost" id="cancelBtn">Cancel</button>
+    <button class="btn btn-primary" id="saveBtn">Save item</button>
+  </div>
+</div>
+
+<script>
+let items = [
+  {id:1, name:"A4 Paper, 80gsm", cat:"Paper & Print", loc:"Shelf B2", qty:23, min:30},
+  {id:2, name:"Black Ballpoint Pens (box)", cat:"Writing", loc:"Drawer A1", qty:64, min:20},
+  {id:3, name:"Ground Coffee, 1kg", cat:"Kitchen", loc:"Pantry", qty:18, min:25},
+  {id:4, name:"Disinfectant Wipes", cat:"Cleaning", loc:"Cleaning Closet", qty:60, min:25},
+  {id:5, name:"USB-C Cables", cat:"Tech", loc:"IT Cabinet", qty:24, min:25},
+  {id:6, name:"Padded Mailers, Medium", cat:"Mailing", loc:"Shelf C1", qty:50, min:18},
+];
+let nextId = 7;
+let editingId = null;
+
+const rowsEl = document.getElementById('rows');
+const emptyEl = document.getElementById('emptyState');
+const overlay = document.getElementById('overlay');
+const panel = document.getElementById('panel');
+
+function fmtPct(it){ return Math.max(0, Math.min(100, it.qty)); }
+function isLow(it){ return it.qty <= it.min; }
+
+function render(){
+  rowsEl.innerHTML = '';
+  emptyEl.style.display = items.length ? 'none' : 'block';
+
+  document.getElementById('statTotal').textContent = items.length;
+  document.getElementById('statLow').textContent = items.filter(isLow).length;
+  document.getElementById('statCats').textContent = new Set(items.map(i=>i.cat)).size;
+
+  items.forEach((it, idx) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.animationDelay = (idx * 35) + 'ms';
+    row.dataset.id = it.id;
+    const low = isLow(it);
+    row.innerHTML = `
+      <div class="item-name-cell">
+        <div class="item-name">${escapeHtml(it.name)}</div>
+        <div class="item-loc">${escapeHtml(it.loc)}</div>
+      </div>
+      <div><span class="cat-pill">${escapeHtml(it.cat)}</span></div>
+      <div class="gauge-wrap">
+        <span class="gauge-num">${it.qty}% in stock</span>
+        <div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${fmtPct(it)}"></div></div>
+      </div>
+      <div>
+        <span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span>
+      </div>
+      <div class="row-actions">
+        <button class="edit-dot" title="Edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+      </div>
+    `;
+    row.addEventListener('click', () => openEdit(it.id));
+    rowsEl.appendChild(row);
+  });
+
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('.gauge-fill').forEach(g=>{
+      const t = g.dataset.target;
+      requestAnimationFrame(()=>{ g.style.width = t + '%'; });
+    });
+  });
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function openPanel(){ overlay.classList.add('show'); panel.classList.add('show'); }
+function closePanel(){ overlay.classList.remove('show'); panel.classList.remove('show'); editingId = null; }
+
+function openAdd(){
+  editingId = null;
+  document.getElementById('panelTitle').textContent = 'Add item';
+  document.getElementById('panelSub').textContent = 'New entry for the supply room';
+  document.getElementById('deleteBtn').style.display = 'none';
+  document.getElementById('saveBtn').textContent = 'Save item';
+  document.getElementById('itemForm').reset();
+  document.getElementById('f-qty').value = 100;
+  document.getElementById('f-min').value = 25;
+  openPanel();
+  setTimeout(()=>document.getElementById('f-name').focus(), 300);
+}
+
+function openEdit(id){
+  const it = items.find(i=>i.id===id);
+  if(!it) return;
+  editingId = id;
+  document.getElementById('panelTitle').textContent = 'Edit item';
+  document.getElementById('panelSub').textContent = it.name;
+  document.getElementById('deleteBtn').style.display = 'block';
+  document.getElementById('saveBtn').textContent = 'Save changes';
+  document.getElementById('f-name').value = it.name;
+  document.getElementById('f-cat').value = it.cat;
+  document.getElementById('f-loc').value = it.loc;
+  document.getElementById('f-qty').value = it.qty;
+  document.getElementById('f-min').value = it.min;
+  openPanel();
+}
+
+function save(){
+  const name = document.getElementById('f-name').value.trim();
+  const cat = document.getElementById('f-cat').value;
+  const loc = document.getElementById('f-loc').value.trim();
+  const qty = Math.max(0, Math.min(100, parseInt(document.getElementById('f-qty').value || '0', 10)));
+  const min = Math.max(0, Math.min(100, parseInt(document.getElementById('f-min').value || '0', 10)));
+  if(!name || !loc){ document.getElementById('f-name').focus(); return; }
+
+  if(editingId){
+    const it = items.find(i=>i.id===editingId);
+    it.name=name; it.cat=cat; it.loc=loc; it.qty=qty; it.min=min;
+  } else {
+    items.unshift({id: nextId++, name, cat, loc, qty, min});
+  }
+  closePanel();
+  render();
+}
+
+function remove(){
+  if(!editingId) return;
+  const el = document.querySelector(`.row[data-id="${editingId}"]`);
+  items = items.filter(i=>i.id!==editingId);
+  closePanel();
+  if(el){
+    el.classList.add('leaving');
+    setTimeout(render, 260);
+  } else {
+    render();
+  }
+}
+
+document.getElementById('openAdd').addEventListener('click', openAdd);
+document.getElementById('closePanel').addEventListener('click', closePanel);
+document.getElementById('cancelBtn').addEventListener('click', closePanel);
+document.getElementById('overlay').addEventListener('click', closePanel);
+document.getElementById('saveBtn').addEventListener('click', save);
+document.getElementById('deleteBtn').addEventListener('click', remove);
+document.getElementById('itemForm').addEventListener('submit', e=>{ e.preventDefault(); save(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); });
+
+render();
+</script>
+
+
+</body></html>

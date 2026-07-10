@@ -7,232 +7,100 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,650&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#F6F4EF;
-    --ink:#22281F;
-    --ink-soft:#5B6356;
-    --line:#DCD7C9;
-    --slate:#3D5A52;
-    --slate-deep:#28403A;
-    --amber:#C97A3C;
-    --amber-soft:#F1DCC4;
-    --ok:#5C7A52;
-    --ok-soft:#E2EAD8;
-    --card:#FFFFFF;
-    --shadow: 0 10px 30px -12px rgba(34,40,31,0.18);
+    --paper:#F6F4EF;--ink:#22281F;--ink-soft:#5B6356;--line:#DCD7C9;
+    --slate:#3D5A52;--slate-deep:#28403A;--amber:#C97A3C;--amber-soft:#F1DCC4;
+    --ok:#5C7A52;--ok-soft:#E2EAD8;--card:#FFFFFF;
+    --shadow:0 10px 30px -12px rgba(34,40,31,0.18);
   }
   *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
   .wrap{max-width:980px;margin:0 auto;padding:48px 28px 100px;}
-
   .top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;gap:20px;}
-  .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--slate);margin:0 0 6px;
-  }
-  h1{
-    font-family:'Fraunces',serif;
-    font-weight:560;
-    font-size:42px;
-    margin:0;
-    letter-spacing:-0.01em;
-  }
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);margin:0 0 6px;}
+  h1{font-family:'Fraunces',serif;font-weight:560;font-size:42px;margin:0;letter-spacing:-0.01em;}
   .sub{color:var(--ink-soft);font-size:14.5px;margin-top:8px;max-width:46ch;line-height:1.5;}
-
-  .add-btn{
-    font-family:'Inter',sans-serif;
-    background:var(--slate-deep);
-    color:#fff;border:none;border-radius:10px;
-    padding:13px 20px;font-size:14px;font-weight:600;
-    cursor:pointer;white-space:nowrap;
-    display:flex;align-items:center;gap:8px;
-    transition:transform .18s ease, background .18s ease;
-  }
+  .add-btn{font-family:'Inter',sans-serif;background:var(--slate-deep);color:#fff;border:none;border-radius:10px;padding:13px 20px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;transition:transform .18s ease,background .18s ease;}
   .add-btn:hover{background:var(--slate);transform:translateY(-1px);}
-  .add-btn:active{transform:translateY(0);}
   .add-btn svg{width:15px;height:15px;}
-
-  .stats{
-    display:grid;grid-template-columns:repeat(3,1fr);
-    gap:1px;background:var(--line);
-    border:1px solid var(--line);border-radius:14px;overflow:hidden;
-    margin:32px 0 36px;
-  }
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:32px 0 36px;}
   .stat{background:var(--card);padding:18px 20px;}
   .stat .n{font-family:'Fraunces',serif;font-size:28px;font-weight:560;line-height:1;}
   .stat .l{font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.02em;}
   .stat.low .n{color:var(--amber);}
-
-  .list-head{
-    display:grid;grid-template-columns:2.4fr 1fr 1.4fr 1.1fr 70px;
-    padding:0 18px 10px;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--ink-soft);
-  }
+  .list-head{display:grid;grid-template-columns:2.4fr 1fr 1.4fr 1.1fr 70px;padding:0 18px 10px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
   #rows{display:flex;flex-direction:column;gap:8px;}
-  .row{
-    display:grid;grid-template-columns:2.4fr 1fr 1.4fr 1.1fr 70px;
-    align-items:center;
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:14px 18px;
-    transition: box-shadow .2s ease, border-color .2s ease;
-    animation: riseIn .42s cubic-bezier(.2,.8,.2,1) both;
-  }
+  .row{display:grid;grid-template-columns:2.4fr 1fr 1.4fr 1.1fr 70px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;transition:box-shadow .2s ease,border-color .2s ease;animation:riseIn .42s cubic-bezier(.2,.8,.2,1) both;}
   .row:hover{box-shadow:var(--shadow);border-color:#cfc8b5;cursor:pointer;}
-  @keyframes riseIn{
-    from{opacity:0; transform:translateY(10px) scale(.99);}
-    to{opacity:1; transform:translateY(0) scale(1);}
-  }
-  .row.leaving{
-    animation: fadeOut .28s ease forwards;
-  }
-  @keyframes fadeOut{
-    to{opacity:0; transform:translateX(14px) scale(.97); margin-top:-66px;}
-  }
-
+  @keyframes riseIn{from{opacity:0;transform:translateY(10px) scale(.99);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .row.leaving{animation:fadeOut .28s ease forwards;}
+  @keyframes fadeOut{to{opacity:0;transform:translateX(14px) scale(.97);margin-top:-66px;}}
   .item-name{font-weight:600;font-size:14.5px;}
   .item-loc{font-size:12px;color:var(--ink-soft);margin-top:2px;}
-  .cat-pill{
-    font-size:11px;font-weight:600;color:var(--slate);
-    background:#EAF0EB;border-radius:999px;padding:4px 10px;
-    width:fit-content;
-  }
-
+  .cat-pill{font-size:11px;font-weight:600;color:var(--slate);background:#EAF0EB;border-radius:999px;padding:4px 10px;width:fit-content;}
   .gauge-wrap{display:flex;flex-direction:column;gap:5px;}
   .gauge-top{display:flex;justify-content:space-between;align-items:baseline;}
   .gauge-num{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:var(--ink);}
   .gauge-min{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);}
   .gauge{height:8px;border-radius:4px;background:var(--line);position:relative;}
-  .gauge-fill{
-    height:100%;border-radius:4px;background:var(--ok);
-    width:0%;
-    transition: width .7s cubic-bezier(.2,.8,.2,1), background .4s ease;
-  }
+  .gauge-fill{height:100%;border-radius:4px;background:var(--ok);width:0%;transition:width .7s cubic-bezier(.2,.8,.2,1),background .4s ease;}
   .gauge-fill.low{background:var(--amber);}
-  .gauge-marker{
-    position:absolute;top:-2px;height:12px;width:2px;
-    background:var(--amber);border-radius:2px;
-    transform:translateX(-50%);
-    transition: left .7s cubic-bezier(.2,.8,.2,1);
-  }
-
-  .status{
-    font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;
-    width:fit-content;display:flex;align-items:center;gap:6px;
-  }
+  .gauge-marker{position:absolute;top:-2px;height:12px;width:2px;background:var(--amber);border-radius:2px;transform:translateX(-50%);transition:left .7s cubic-bezier(.2,.8,.2,1);}
+  .status{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;width:fit-content;display:flex;align-items:center;gap:6px;}
   .status.ok{background:var(--ok-soft);color:#3C5635;}
   .status.low{background:var(--amber-soft);color:#8A4E1F;}
   .status .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
   .status.low .dot{animation:pulse 1.5s ease-in-out infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
-
   .row-actions{display:flex;justify-content:flex-end;}
-  .edit-dot{
-    width:30px;height:30px;border-radius:8px;border:1px solid var(--line);
-    background:transparent;display:flex;align-items:center;justify-content:center;
-    color:var(--ink-soft);cursor:pointer;transition:.15s ease;
-  }
+  .edit-dot{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);cursor:pointer;transition:.15s ease;}
   .edit-dot:hover{background:var(--slate-deep);color:#fff;border-color:var(--slate-deep);}
   .edit-dot svg{width:14px;height:14px;}
-
-  .empty{
-    text-align:center;padding:60px 20px;color:var(--ink-soft);
-    font-size:14px;border:1px dashed var(--line);border-radius:14px;
-  }
-
-  .overlay{
-    position:fixed;inset:0;background:rgba(34,40,31,0.32);
-    opacity:0;pointer-events:none;transition:opacity .25s ease;
-    z-index:30;
-  }
+  .empty{text-align:center;padding:60px 20px;color:var(--ink-soft);font-size:14px;border:1px dashed var(--line);border-radius:14px;}
+  .skeleton{background:linear-gradient(90deg,var(--line) 25%,#e8e4d8 50%,var(--line) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+  @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+  .skeleton-row{height:62px;border-radius:12px;margin-bottom:8px;}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;z-index:99;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.err{background:#8B3A2A;}
+  .overlay{position:fixed;inset:0;background:rgba(34,40,31,0.32);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:30;}
   .overlay.show{opacity:1;pointer-events:auto;}
-
-  .panel{
-    position:fixed;top:0;right:0;height:100%;width:min(420px,92vw);
-    background:var(--paper);
-    border-left:1px solid var(--line);
-    box-shadow:-20px 0 50px -20px rgba(0,0,0,0.25);
-    transform:translateX(100%);
-    transition:transform .38s cubic-bezier(.2,.8,.2,1);
-    z-index:31;
-    display:flex;flex-direction:column;
-  }
+  .panel{position:fixed;top:0;right:0;height:100%;width:min(420px,92vw);background:var(--paper);border-left:1px solid var(--line);box-shadow:-20px 0 50px -20px rgba(0,0,0,0.25);transform:translateX(100%);transition:transform .38s cubic-bezier(.2,.8,.2,1);z-index:31;display:flex;flex-direction:column;}
   .panel.show{transform:translateX(0);}
-
-  .panel-head{
-    padding:26px 26px 18px;border-bottom:1px solid var(--line);
-    display:flex;justify-content:space-between;align-items:flex-start;
-  }
-  .panel-head h2{
-    font-family:'Fraunces',serif;font-weight:560;font-size:24px;margin:0 0 4px;
-  }
+  .panel-head{padding:26px 26px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;}
+  .panel-head h2{font-family:'Fraunces',serif;font-weight:560;font-size:24px;margin:0 0 4px;}
   .panel-head p{margin:0;font-size:13px;color:var(--ink-soft);}
-  .close-btn{
-    background:none;border:none;color:var(--ink-soft);cursor:pointer;
-    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
-    border-radius:8px;transition:.15s;
-  }
+  .close-btn{background:none;border:none;color:var(--ink-soft);cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:.15s;}
   .close-btn:hover{background:var(--line);color:var(--ink);}
-
   form{padding:24px 26px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;flex:1;}
-  .field label{
-    display:block;font-size:12px;font-weight:600;color:var(--ink-soft);
-    margin-bottom:7px;letter-spacing:.01em;
-  }
-  .field input, .field select{
-    width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;
-    font-family:'Inter',sans-serif;font-size:14px;background:#fff;color:var(--ink);
-    transition:border-color .15s ease, box-shadow .15s ease;
-  }
-  .field input:focus, .field select:focus{
-    outline:none;border-color:var(--slate);box-shadow:0 0 0 3px rgba(61,90,82,0.14);
-  }
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:7px;letter-spacing:.01em;}
+  .field input,.field select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:'Inter',sans-serif;font-size:14px;background:#fff;color:var(--ink);transition:border-color .15s ease,box-shadow .15s ease;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--slate);box-shadow:0 0 0 3px rgba(61,90,82,0.14);}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-
-  .panel-foot{
-    padding:18px 26px 26px;border-top:1px solid var(--line);
-    display:flex;gap:10px;
-  }
-  .btn{
-    flex:1;padding:13px;border-radius:9px;font-size:14px;font-weight:600;
-    cursor:pointer;border:1px solid transparent;transition:.15s ease;
-    font-family:'Inter',sans-serif;
-  }
+  .panel-foot{padding:18px 26px 26px;border-top:1px solid var(--line);display:flex;gap:10px;}
+  .btn{flex:1;padding:13px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:.15s ease;font-family:'Inter',sans-serif;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
   .btn-primary{background:var(--slate-deep);color:#fff;}
-  .btn-primary:hover{background:var(--slate);}
+  .btn-primary:hover:not(:disabled){background:var(--slate);}
   .btn-ghost{background:transparent;color:var(--ink-soft);border-color:var(--line);}
-  .btn-ghost:hover{background:#fff;color:var(--ink);}
+  .btn-ghost:hover:not(:disabled){background:#fff;color:var(--ink);}
   .btn-danger{background:transparent;color:#A14B2A;border-color:#E9C9B4;}
-  .btn-danger:hover{background:#FBEEE5;}
-
-  @media (max-width:640px){
-    .top{flex-direction:column;align-items:flex-start;}
-    .add-btn{width:100%;justify-content:center;}
-    .stats{grid-template-columns:1fr;}
-    .list-head{display:none;}
-    .row{grid-template-columns:1fr auto;grid-template-areas:"name actions" "gauge gauge" "status cat";row-gap:8px;}
-    .item-name-cell{grid-area:name;}
-    .gauge-wrap{grid-area:gauge;}
-    .row-actions{grid-area:actions;}
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:.001s !important; transition-duration:.001s !important;}
-  }
+  .btn-danger:hover:not(:disabled){background:#FBEEE5;}
+  .config-banner{background:#FFF8EF;border:1px solid var(--amber-soft);border-radius:12px;padding:16px 20px;margin-bottom:28px;font-size:13.5px;line-height:1.6;color:#6B3E10;}
+  .config-banner strong{display:block;margin-bottom:6px;font-size:14px;}
+  .config-banner input{width:100%;margin-top:10px;padding:9px 12px;border:1px solid #E0C4A0;border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;background:#fff;}
+  .config-banner .save-url{margin-top:8px;padding:8px 16px;border-radius:8px;border:none;background:var(--amber);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+  @media(max-width:640px){.top{flex-direction:column;align-items:flex-start;}.add-btn{width:100%;justify-content:center;}.stats{grid-template-columns:1fr;}.list-head{display:none;}.row{grid-template-columns:1fr auto;grid-template-areas:"name actions" "gauge gauge" "status cat";row-gap:8px;}.item-name-cell{grid-area:name;}.gauge-wrap{grid-area:gauge;}.row-actions{grid-area:actions;}}
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.001s !important;transition-duration:.001s !important;}}
 </style>
 </head>
 <body>
-
 <div class="wrap">
+  <div id="configBanner" class="config-banner" style="display:none;">
+    <strong>⚙️ Connect to Google Sheets</strong>
+    Paste your Apps Script Web App URL below to enable live saving. Get it from <em>Deploy → Manage deployments</em> in Apps Script.
+    <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/...">
+    <button class="save-url" onclick="saveScriptUrl()">Save &amp; Connect</button>
+  </div>
   <div class="top">
     <div>
       <p class="eyebrow">3rd floor · supply room</p>
@@ -244,27 +112,26 @@
       Add item
     </button>
   </div>
-
   <div class="stats">
-    <div class="stat"><div class="n" id="statTotal">0</div><div class="l">items tracked</div></div>
-    <div class="stat low"><div class="n" id="statLow">0</div><div class="l">running low</div></div>
-    <div class="stat"><div class="n" id="statCats">0</div><div class="l">categories</div></div>
+    <div class="stat"><div class="n" id="statTotal">—</div><div class="l">items tracked</div></div>
+    <div class="stat low"><div class="n" id="statLow">—</div><div class="l">running low</div></div>
+    <div class="stat"><div class="n" id="statCats">—</div><div class="l">categories</div></div>
   </div>
-
   <div class="list-head">
     <div>Item</div><div>Category</div><div>Stock</div><div>Status</div><div></div>
   </div>
-  <div id="rows"></div>
+  <div id="rows">
+    <div class="skeleton skeleton-row"></div>
+    <div class="skeleton skeleton-row"></div>
+    <div class="skeleton skeleton-row"></div>
+  </div>
   <div class="empty" id="emptyState" style="display:none;">No items yet — add your first one.</div>
 </div>
-
+<div class="toast" id="toast"></div>
 <div class="overlay" id="overlay"></div>
 <div class="panel" id="panel">
   <div class="panel-head">
-    <div>
-      <h2 id="panelTitle">Add item</h2>
-      <p id="panelSub">New entry for the supply room</p>
-    </div>
+    <div><h2 id="panelTitle">Add item</h2><p id="panelSub">New entry for the supply room</p></div>
     <button class="close-btn" id="closePanel">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
     </button>
@@ -308,149 +175,157 @@
     <button class="btn btn-primary" id="saveBtn">Save item</button>
   </div>
 </div>
-
 <script>
-let items = [
-  {id:1, name:"A4 Paper, 80gsm", cat:"Paper & Print", loc:"Shelf B2", qty:23, min:30},
-  {id:2, name:"Black Ballpoint Pens (box)", cat:"Writing", loc:"Drawer A1", qty:64, min:20},
-  {id:3, name:"Ground Coffee, 1kg", cat:"Kitchen", loc:"Pantry", qty:18, min:25},
-  {id:4, name:"Disinfectant Wipes", cat:"Cleaning", loc:"Cleaning Closet", qty:60, min:25},
-  {id:5, name:"USB-C Cables", cat:"Tech", loc:"IT Cabinet", qty:24, min:25},
-  {id:6, name:"Padded Mailers, Medium", cat:"Mailing", loc:"Shelf C1", qty:50, min:18},
-];
-let nextId = 7;
-let editingId = null;
-
-const rowsEl = document.getElementById('rows');
-const emptyEl = document.getElementById('emptyState');
-const overlay = document.getElementById('overlay');
-const panel = document.getElementById('panel');
-
-function fmtPct(it){ return Math.max(0, Math.min(100, it.qty)); }
+let SCRIPT_URL = localStorage.getItem('inventoryScriptUrl') || '';
+function saveScriptUrl() {
+  const val = document.getElementById('scriptUrlInput').value.trim();
+  if (!val.startsWith('https://script.google.com')) { showToast('Please paste a valid Apps Script URL', true); return; }
+  SCRIPT_URL = val;
+  localStorage.setItem('inventoryScriptUrl', val);
+  document.getElementById('configBanner').style.display = 'none';
+  showToast('Connected! Loading data…');
+  loadItems();
+}
+let items = [], editingId = null, busy = false;
+window.addEventListener('DOMContentLoaded', () => {
+  if (!SCRIPT_URL) {
+    document.getElementById('configBanner').style.display = 'block';
+    document.getElementById('rows').innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('emptyState').textContent = 'Connect to Google Sheets above to load your inventory.';
+  } else { loadItems(); }
+});
+async function loadItems() {
+  try {
+    const res = await fetch(SCRIPT_URL);
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    items = data.items.map(i => ({...i, qty: Number(i.qty), min: Number(i.min), id: Number(i.id)}));
+    render();
+  } catch(e) {
+    showToast('Could not load data — check your URL', true);
+    document.getElementById('rows').innerHTML = '';
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('emptyState').textContent = 'Failed to load. Check your Apps Script URL above.';
+    document.getElementById('configBanner').style.display = 'block';
+  }
+}
+async function apiPost(action, item) {
+  const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, item }) });
+  return res.json();
+}
 function isLow(it){ return it.qty <= it.min; }
-
+function fmtPct(it){ return Math.max(0, Math.min(100, it.qty)); }
 function render(){
+  const rowsEl = document.getElementById('rows');
   rowsEl.innerHTML = '';
-  emptyEl.style.display = items.length ? 'none' : 'block';
-
+  document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
   document.getElementById('statTotal').textContent = items.length;
   document.getElementById('statLow').textContent = items.filter(isLow).length;
   document.getElementById('statCats').textContent = new Set(items.map(i=>i.cat)).size;
-
   items.forEach((it, idx) => {
+    const low = isLow(it);
     const row = document.createElement('div');
     row.className = 'row';
     row.style.animationDelay = (idx * 35) + 'ms';
     row.dataset.id = it.id;
-    const low = isLow(it);
     row.innerHTML = `
-      <div class="item-name-cell">
-        <div class="item-name">${escapeHtml(it.name)}</div>
-        <div class="item-loc">${escapeHtml(it.loc)}</div>
-      </div>
-      <div><span class="cat-pill">${escapeHtml(it.cat)}</span></div>
+      <div class="item-name-cell"><div class="item-name">${esc(it.name)}</div><div class="item-loc">${esc(it.loc)}</div></div>
+      <div><span class="cat-pill">${esc(it.cat)}</span></div>
       <div class="gauge-wrap">
-        <div class="gauge-top">
-          <span class="gauge-num">${it.qty}%</span>
-          <span class="gauge-min">reorder at ${it.min}%</span>
-        </div>
-        <div class="gauge">
-          <div class="gauge-fill ${low?'low':''}" data-target="${fmtPct(it)}"></div>
-          <div class="gauge-marker" data-marker="${it.min}"></div>
-        </div>
+        <div class="gauge-top"><span class="gauge-num">${it.qty}%</span><span class="gauge-min">reorder at ${it.min}%</span></div>
+        <div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${fmtPct(it)}"></div><div class="gauge-marker" data-marker="${it.min}"></div></div>
       </div>
-      <div>
-        <span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span>
-      </div>
-      <div class="row-actions">
-        <button class="edit-dot" title="Edit">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-        </button>
-      </div>
-    `;
+      <div><span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span></div>
+      <div class="row-actions"><button class="edit-dot" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;
     row.addEventListener('click', () => openEdit(it.id));
     rowsEl.appendChild(row);
   });
-
   requestAnimationFrame(()=>{
-    document.querySelectorAll('.gauge-fill').forEach(g=>{
-      const t = g.dataset.target;
-      requestAnimationFrame(()=>{ g.style.width = t + '%'; });
-    });
-    document.querySelectorAll('.gauge-marker').forEach(m=>{
-      const t = m.dataset.marker;
-      requestAnimationFrame(()=>{ m.style.left = t + '%'; });
-    });
+    document.querySelectorAll('.gauge-fill').forEach(g=>{ requestAnimationFrame(()=>{ g.style.width = g.dataset.target + '%'; }); });
+    document.querySelectorAll('.gauge-marker').forEach(m=>{ requestAnimationFrame(()=>{ m.style.left = m.dataset.marker + '%'; }); });
   });
 }
-
-function escapeHtml(s){
-  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-function openPanel(){ overlay.classList.add('show'); panel.classList.add('show'); }
-function closePanel(){ overlay.classList.remove('show'); panel.classList.remove('show'); editingId = null; }
-
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function openPanel(){ document.getElementById('overlay').classList.add('show'); document.getElementById('panel').classList.add('show'); }
+function closePanel(){ document.getElementById('overlay').classList.remove('show'); document.getElementById('panel').classList.remove('show'); editingId=null; }
 function openAdd(){
-  editingId = null;
-  document.getElementById('panelTitle').textContent = 'Add item';
-  document.getElementById('panelSub').textContent = 'New entry for the supply room';
-  document.getElementById('deleteBtn').style.display = 'none';
-  document.getElementById('saveBtn').textContent = 'Save item';
+  editingId=null;
+  document.getElementById('panelTitle').textContent='Add item';
+  document.getElementById('panelSub').textContent='New entry for the supply room';
+  document.getElementById('deleteBtn').style.display='none';
+  document.getElementById('saveBtn').textContent='Save item';
   document.getElementById('itemForm').reset();
-  document.getElementById('f-qty').value = 100;
-  document.getElementById('f-min').value = 25;
+  document.getElementById('f-qty').value=100;
+  document.getElementById('f-min').value=25;
   openPanel();
-  setTimeout(()=>document.getElementById('f-name').focus(), 300);
+  setTimeout(()=>document.getElementById('f-name').focus(),300);
 }
-
 function openEdit(id){
-  const it = items.find(i=>i.id===id);
-  if(!it) return;
-  editingId = id;
-  document.getElementById('panelTitle').textContent = 'Edit item';
-  document.getElementById('panelSub').textContent = it.name;
-  document.getElementById('deleteBtn').style.display = 'block';
-  document.getElementById('saveBtn').textContent = 'Save changes';
-  document.getElementById('f-name').value = it.name;
-  document.getElementById('f-cat').value = it.cat;
-  document.getElementById('f-loc').value = it.loc;
-  document.getElementById('f-qty').value = it.qty;
-  document.getElementById('f-min').value = it.min;
+  const it=items.find(i=>i.id===id); if(!it) return;
+  editingId=id;
+  document.getElementById('panelTitle').textContent='Edit item';
+  document.getElementById('panelSub').textContent=it.name;
+  document.getElementById('deleteBtn').style.display='block';
+  document.getElementById('saveBtn').textContent='Save changes';
+  document.getElementById('f-name').value=it.name;
+  document.getElementById('f-cat').value=it.cat;
+  document.getElementById('f-loc').value=it.loc;
+  document.getElementById('f-qty').value=it.qty;
+  document.getElementById('f-min').value=it.min;
   openPanel();
 }
-
-function save(){
-  const name = document.getElementById('f-name').value.trim();
-  const cat = document.getElementById('f-cat').value;
-  const loc = document.getElementById('f-loc').value.trim();
-  const qty = Math.max(0, Math.min(100, parseInt(document.getElementById('f-qty').value || '0', 10)));
-  const min = Math.max(0, Math.min(100, parseInt(document.getElementById('f-min').value || '0', 10)));
-  if(!name || !loc){ document.getElementById('f-name').focus(); return; }
-
-  if(editingId){
-    const it = items.find(i=>i.id===editingId);
-    it.name=name; it.cat=cat; it.loc=loc; it.qty=qty; it.min=min;
-  } else {
-    items.unshift({id: nextId++, name, cat, loc, qty, min});
-  }
-  closePanel();
-  render();
+async function save(){
+  if(busy) return;
+  const name=document.getElementById('f-name').value.trim();
+  const cat=document.getElementById('f-cat').value;
+  const loc=document.getElementById('f-loc').value.trim();
+  const qty=Math.max(0,Math.min(100,parseInt(document.getElementById('f-qty').value||'0',10)));
+  const min=Math.max(0,Math.min(100,parseInt(document.getElementById('f-min').value||'0',10)));
+  if(!name||!loc){ document.getElementById('f-name').focus(); return; }
+  setBusy(true);
+  try {
+    if(editingId){
+      const it=items.find(i=>i.id===editingId);
+      await apiPost('edit',{id:editingId,name,cat,loc,qty,min});
+      Object.assign(it,{name,cat,loc,qty,min});
+      showToast('Changes saved ✓');
+    } else {
+      const res=await apiPost('add',{name,cat,loc,qty,min});
+      items.unshift({id:res.id,name,cat,loc,qty,min});
+      showToast('Item added ✓');
+    }
+    closePanel(); render();
+  } catch(e){ showToast('Save failed — try again', true); }
+  setBusy(false);
 }
-
-function remove(){
-  if(!editingId) return;
-  const el = document.querySelector(`.row[data-id="${editingId}"]`);
-  items = items.filter(i=>i.id!==editingId);
-  closePanel();
-  if(el){
-    el.classList.add('leaving');
-    setTimeout(render, 260);
-  } else {
-    render();
-  }
+async function remove(){
+  if(busy||!editingId) return;
+  setBusy(true);
+  try {
+    await apiPost('delete',{id:editingId});
+    const el=document.querySelector(`.row[data-id="${editingId}"]`);
+    items=items.filter(i=>i.id!==editingId);
+    closePanel();
+    if(el){ el.classList.add('leaving'); setTimeout(render,260); } else { render(); }
+    showToast('Item removed');
+  } catch(e){ showToast('Delete failed — try again', true); }
+  setBusy(false);
 }
-
+function setBusy(b){
+  busy=b;
+  ['saveBtn','deleteBtn','cancelBtn'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=b; });
+  document.getElementById('saveBtn').textContent = b ? 'Saving…' : (editingId ? 'Save changes' : 'Save item');
+}
+let toastTimer;
+function showToast(msg, isErr=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(isErr?' err':'');
+  requestAnimationFrame(()=>{ t.classList.add('show'); });
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
 document.getElementById('openAdd').addEventListener('click', openAdd);
 document.getElementById('closePanel').addEventListener('click', closePanel);
 document.getElementById('cancelBtn').addEventListener('click', closePanel);
@@ -459,8 +334,6 @@ document.getElementById('saveBtn').addEventListener('click', save);
 document.getElementById('deleteBtn').addEventListener('click', remove);
 document.getElementById('itemForm').addEventListener('submit', e=>{ e.preventDefault(); save(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); });
-
-render();
 </script>
 </body>
 </html>

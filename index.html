@@ -88,22 +88,12 @@
   .btn-ghost:hover:not(:disabled){background:#fff;color:var(--ink);}
   .btn-danger{background:transparent;color:#A14B2A;border-color:#E9C9B4;}
   .btn-danger:hover:not(:disabled){background:#FBEEE5;}
-  .config-banner{background:#FFF8EF;border:1px solid var(--amber-soft);border-radius:12px;padding:16px 20px;margin-bottom:28px;font-size:13.5px;line-height:1.6;color:#6B3E10;}
-  .config-banner strong{display:block;margin-bottom:6px;font-size:14px;}
-  .config-banner input{width:100%;margin-top:10px;padding:9px 12px;border:1px solid #E0C4A0;border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;background:#fff;}
-  .config-banner .save-url{margin-top:8px;padding:8px 16px;border-radius:8px;border:none;background:var(--amber);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
   @media(max-width:640px){.top{flex-direction:column;align-items:flex-start;}.add-btn{width:100%;justify-content:center;}.stats{grid-template-columns:1fr;}.list-head{display:none;}.row{grid-template-columns:1fr auto;grid-template-areas:"name actions" "gauge gauge" "status cat";row-gap:8px;}.item-name-cell{grid-area:name;}.gauge-wrap{grid-area:gauge;}.row-actions{grid-area:actions;}}
   @media(prefers-reduced-motion:reduce){*{animation-duration:.001s !important;transition-duration:.001s !important;}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div id="configBanner" class="config-banner" style="display:none;">
-    <strong>⚙️ Connect to Google Sheets</strong>
-    Paste your Apps Script Web App URL below to enable live saving.
-    <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/...">
-    <button class="save-url" onclick="saveScriptUrl()">Save &amp; Connect</button>
-  </div>
   <div class="top">
     <div>
       <p class="eyebrow">3rd floor · supply room</p>
@@ -188,32 +178,17 @@
   </div>
 </div>
 <script>
-let SCRIPT_URL = localStorage.getItem('inventoryScriptUrl') || '';
-function saveScriptUrl() {
-  const val = document.getElementById('scriptUrlInput').value.trim();
-  if (!val.startsWith('https://script.google.com')) { showToast('Please paste a valid Apps Script URL', true); return; }
-  SCRIPT_URL = val;
-  localStorage.setItem('inventoryScriptUrl', val);
-  document.getElementById('configBanner').style.display = 'none';
-  showToast('Connected! Loading data…');
-  loadItems();
-}
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaesjanebel3Fj8pfa-Y24uzqVByw4O0jSeRXlzPvRREjXRAkAHtVbxJj3902qiRZb1g/exec';
 let items = [], editingId = null, busy = false;
 window.addEventListener('DOMContentLoaded', () => {
-  if (!SCRIPT_URL) {
-    document.getElementById('configBanner').style.display = 'block';
-    document.getElementById('rows').innerHTML = '';
-    document.getElementById('emptyState').style.display = 'block';
-    document.getElementById('emptyState').textContent = 'Connect to Google Sheets above to load your inventory.';
-  } else { loadItems(); }
+  loadItems();
   ['f-qty','f-max'].forEach(id => { document.getElementById(id).addEventListener('input', updatePreview); });
 });
 function updatePreview() {
-  const qty = parseInt(document.getElementById('f-qty').value || '0', 10);
-  const max = parseInt(document.getElementById('f-max').value || '0', 10);
+  const qty = parseInt(document.getElementById('f-qty').value||'0',10);
+  const max = parseInt(document.getElementById('f-max').value||'0',10);
   const el = document.getElementById('pctPreview');
-  if (max > 0) { el.textContent = '→ ' + Math.round((qty/max)*100) + '% full (' + qty + ' of ' + max + ')'; }
-  else { el.textContent = ''; }
+  el.textContent = max > 0 ? '→ '+Math.round((qty/max)*100)+'% full ('+qty+' of '+max+')' : '';
 }
 async function loadItems() {
   try {
@@ -223,51 +198,50 @@ async function loadItems() {
     items = data.items.map(i => ({...i, qty:Number(i.qty), max:Number(i.max)||100, min:Number(i.min), id:Number(i.id)}));
     render();
   } catch(e) {
-    showToast('Could not load data — check your URL', true);
+    showToast('Could not load data — try refreshing', true);
     document.getElementById('rows').innerHTML = '';
     document.getElementById('emptyState').style.display = 'block';
-    document.getElementById('emptyState').textContent = 'Failed to load. Check your Apps Script URL above.';
-    document.getElementById('configBanner').style.display = 'block';
+    document.getElementById('emptyState').textContent = 'Failed to load — please refresh the page.';
   }
 }
 async function apiPost(action, item) {
-  const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, item }) });
+  const res = await fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify({action,item}) });
   return res.json();
 }
-function pct(it)   { return Math.max(0, Math.min(100, Math.round((it.qty / it.max) * 100))); }
-function minPct(it){ return Math.max(0, Math.min(100, Math.round((it.min / it.max) * 100))); }
+function pct(it)   { return Math.max(0,Math.min(100,Math.round((it.qty/it.max)*100))); }
+function minPct(it){ return Math.max(0,Math.min(100,Math.round((it.min/it.max)*100))); }
 function isLow(it) { return it.qty <= it.min; }
 function render(){
-  const rowsEl = document.getElementById('rows');
-  rowsEl.innerHTML = '';
-  document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
-  document.getElementById('statTotal').textContent = items.length;
-  document.getElementById('statLow').textContent   = items.filter(isLow).length;
-  document.getElementById('statCats').textContent  = new Set(items.map(i=>i.cat)).size;
-  items.forEach((it, idx) => {
-    const low=isLow(it), p=pct(it), mp=minPct(it);
+  const rowsEl=document.getElementById('rows');
+  rowsEl.innerHTML='';
+  document.getElementById('emptyState').style.display=items.length?'none':'block';
+  document.getElementById('statTotal').textContent=items.length;
+  document.getElementById('statLow').textContent=items.filter(isLow).length;
+  document.getElementById('statCats').textContent=new Set(items.map(i=>i.cat)).size;
+  items.forEach((it,idx)=>{
+    const low=isLow(it),p=pct(it),mp=minPct(it);
     const row=document.createElement('div');
     row.className='row'; row.style.animationDelay=(idx*35)+'ms'; row.dataset.id=it.id;
     row.innerHTML=`
       <div class="item-name-cell"><div class="item-name">${esc(it.name)}</div><div class="item-loc">${esc(it.loc)}</div></div>
       <div><span class="cat-pill">${esc(it.cat)}</span></div>
       <div class="gauge-wrap">
-        <div class="gauge-top"><span class="gauge-num">${it.qty} / ${it.max}</span><span class="gauge-pct">${p}% &nbsp;·&nbsp; reorder at ${it.min}</span></div>
+        <div class="gauge-top"><span class="gauge-num">${it.qty} / ${it.max}</span><span class="gauge-pct">${p}% · reorder at ${it.min}</span></div>
         <div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${p}"></div><div class="gauge-marker" data-marker="${mp}"></div></div>
       </div>
       <div><span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span></div>
-      <div class="row-actions"><button class="edit-dot" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;
-    row.addEventListener('click', () => openEdit(it.id));
+      <div class="row-actions"><button class="edit-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;
+    row.addEventListener('click',()=>openEdit(it.id));
     rowsEl.appendChild(row);
   });
   requestAnimationFrame(()=>{
-    document.querySelectorAll('.gauge-fill').forEach(g=>{ requestAnimationFrame(()=>{ g.style.width=g.dataset.target+'%'; }); });
-    document.querySelectorAll('.gauge-marker').forEach(m=>{ requestAnimationFrame(()=>{ m.style.left=m.dataset.marker+'%'; }); });
+    document.querySelectorAll('.gauge-fill').forEach(g=>{requestAnimationFrame(()=>{g.style.width=g.dataset.target+'%';});});
+    document.querySelectorAll('.gauge-marker').forEach(m=>{requestAnimationFrame(()=>{m.style.left=m.dataset.marker+'%';});});
   });
 }
-function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function openPanel(){ document.getElementById('overlay').classList.add('show'); document.getElementById('panel').classList.add('show'); }
-function closePanel(){ document.getElementById('overlay').classList.remove('show'); document.getElementById('panel').classList.remove('show'); editingId=null; }
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function openPanel(){document.getElementById('overlay').classList.add('show');document.getElementById('panel').classList.add('show');}
+function closePanel(){document.getElementById('overlay').classList.remove('show');document.getElementById('panel').classList.remove('show');editingId=null;}
 function openAdd(){
   editingId=null;
   document.getElementById('panelTitle').textContent='Add item';
@@ -303,9 +277,9 @@ async function save(){
   const qty=Math.max(0,parseInt(document.getElementById('f-qty').value||'0',10));
   const max=Math.max(1,parseInt(document.getElementById('f-max').value||'1',10));
   const min=Math.max(0,parseInt(document.getElementById('f-min').value||'0',10));
-  if(!name||!loc){ document.getElementById('f-name').focus(); return; }
+  if(!name||!loc){document.getElementById('f-name').focus();return;}
   setBusy(true);
-  try {
+  try{
     if(editingId){
       await apiPost('edit',{id:editingId,name,cat,loc,qty,max,min});
       Object.assign(items.find(i=>i.id===editingId),{name,cat,loc,qty,max,min});
@@ -316,32 +290,32 @@ async function save(){
       showToast('Item added ✓');
     }
     closePanel(); render();
-  } catch(e){ showToast('Save failed — try again', true); }
+  } catch(e){showToast('Save failed — try again',true);}
   setBusy(false);
 }
 async function remove(){
   if(busy||!editingId) return;
   setBusy(true);
-  try {
+  try{
     await apiPost('delete',{id:editingId});
     const el=document.querySelector(`.row[data-id="${editingId}"]`);
     items=items.filter(i=>i.id!==editingId);
     closePanel();
-    if(el){ el.classList.add('leaving'); setTimeout(render,260); } else { render(); }
+    if(el){el.classList.add('leaving');setTimeout(render,260);}else{render();}
     showToast('Item removed');
-  } catch(e){ showToast('Delete failed — try again', true); }
+  } catch(e){showToast('Delete failed — try again',true);}
   setBusy(false);
 }
 function setBusy(b){
   busy=b;
-  ['saveBtn','deleteBtn','cancelBtn'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=b; });
+  ['saveBtn','deleteBtn','cancelBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=b;});
   document.getElementById('saveBtn').textContent=b?'Saving…':(editingId?'Save changes':'Save item');
 }
 let toastTimer;
 function showToast(msg,isErr=false){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='toast'+(isErr?' err':'');
-  requestAnimationFrame(()=>{ t.classList.add('show'); });
+  requestAnimationFrame(()=>{t.classList.add('show');});
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
 }

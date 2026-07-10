@@ -27,9 +27,9 @@
   .stat .n{font-family:'Fraunces',serif;font-size:28px;font-weight:560;line-height:1;}
   .stat .l{font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.02em;}
   .stat.low .n{color:var(--amber);}
-  .list-head{display:grid;grid-template-columns:2.4fr 1fr 1.4fr 1.1fr 70px;padding:0 18px 10px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+  .list-head{display:grid;grid-template-columns:2.2fr 1fr 1.6fr 1.1fr 70px;padding:0 18px 10px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
   #rows{display:flex;flex-direction:column;gap:8px;}
-  .row{display:grid;grid-template-columns:2.4fr 1fr 1.4fr 1.1fr 70px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;transition:box-shadow .2s ease,border-color .2s ease;animation:riseIn .42s cubic-bezier(.2,.8,.2,1) both;}
+  .row{display:grid;grid-template-columns:2.2fr 1fr 1.6fr 1.1fr 70px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;transition:box-shadow .2s ease,border-color .2s ease;animation:riseIn .42s cubic-bezier(.2,.8,.2,1) both;}
   .row:hover{box-shadow:var(--shadow);border-color:#cfc8b5;cursor:pointer;}
   @keyframes riseIn{from{opacity:0;transform:translateY(10px) scale(.99);}to{opacity:1;transform:translateY(0) scale(1);}}
   .row.leaving{animation:fadeOut .28s ease forwards;}
@@ -38,9 +38,9 @@
   .item-loc{font-size:12px;color:var(--ink-soft);margin-top:2px;}
   .cat-pill{font-size:11px;font-weight:600;color:var(--slate);background:#EAF0EB;border-radius:999px;padding:4px 10px;width:fit-content;}
   .gauge-wrap{display:flex;flex-direction:column;gap:5px;}
-  .gauge-top{display:flex;justify-content:space-between;align-items:baseline;}
+  .gauge-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px;}
   .gauge-num{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:var(--ink);}
-  .gauge-min{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);}
+  .gauge-pct{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);}
   .gauge{height:8px;border-radius:4px;background:var(--line);position:relative;}
   .gauge-fill{height:100%;border-radius:4px;background:var(--ok);width:0%;transition:width .7s cubic-bezier(.2,.8,.2,1),background .4s ease;}
   .gauge-fill.low{background:var(--amber);}
@@ -75,7 +75,10 @@
   .field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:7px;letter-spacing:.01em;}
   .field input,.field select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font-family:'Inter',sans-serif;font-size:14px;background:#fff;color:var(--ink);transition:border-color .15s ease,box-shadow .15s ease;}
   .field input:focus,.field select:focus{outline:none;border-color:var(--slate);box-shadow:0 0 0 3px rgba(61,90,82,0.14);}
+  .field .hint{font-size:11px;color:var(--ink-soft);margin-top:5px;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .divider{border:none;border-top:1px solid var(--line);margin:4px 0;}
   .panel-foot{padding:18px 26px 26px;border-top:1px solid var(--line);display:flex;gap:10px;}
   .btn{flex:1;padding:13px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:.15s ease;font-family:'Inter',sans-serif;}
   .btn:disabled{opacity:.5;cursor:not-allowed;}
@@ -97,7 +100,7 @@
 <div class="wrap">
   <div id="configBanner" class="config-banner" style="display:none;">
     <strong>⚙️ Connect to Google Sheets</strong>
-    Paste your Apps Script Web App URL below to enable live saving. Get it from <em>Deploy → Manage deployments</em> in Apps Script.
+    Paste your Apps Script Web App URL below to enable live saving.
     <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/...">
     <button class="save-url" onclick="saveScriptUrl()">Save &amp; Connect</button>
   </div>
@@ -139,7 +142,7 @@
   <form id="itemForm">
     <div class="field">
       <label for="f-name">Item name</label>
-      <input id="f-name" required placeholder="e.g. A4 Paper, 80gsm">
+      <input id="f-name" required placeholder="e.g. Ballpoint Pens">
     </div>
     <div class="row2">
       <div class="field">
@@ -158,16 +161,25 @@
         <input id="f-loc" required placeholder="e.g. Shelf B2">
       </div>
     </div>
-    <div class="row2">
+    <hr class="divider">
+    <div class="row3">
       <div class="field">
-        <label for="f-qty">Stock level (%)</label>
-        <input id="f-qty" type="number" min="0" max="100" required placeholder="0">
+        <label for="f-qty">Current qty</label>
+        <input id="f-qty" type="number" min="0" required placeholder="0">
+        <p class="hint">How many now</p>
       </div>
       <div class="field">
-        <label for="f-min">Reorder threshold (%)</label>
-        <input id="f-min" type="number" min="0" max="100" required placeholder="0">
+        <label for="f-max">Max qty</label>
+        <input id="f-max" type="number" min="1" required placeholder="0">
+        <p class="hint">When fully stocked</p>
+      </div>
+      <div class="field">
+        <label for="f-min">Reorder at</label>
+        <input id="f-min" type="number" min="0" required placeholder="0">
+        <p class="hint">Trigger threshold</p>
       </div>
     </div>
+    <div id="pctPreview" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right;margin-top:-8px;"></div>
   </form>
   <div class="panel-foot">
     <button class="btn btn-danger" id="deleteBtn" style="display:none;">Remove</button>
@@ -194,13 +206,21 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('emptyState').style.display = 'block';
     document.getElementById('emptyState').textContent = 'Connect to Google Sheets above to load your inventory.';
   } else { loadItems(); }
+  ['f-qty','f-max'].forEach(id => { document.getElementById(id).addEventListener('input', updatePreview); });
 });
+function updatePreview() {
+  const qty = parseInt(document.getElementById('f-qty').value || '0', 10);
+  const max = parseInt(document.getElementById('f-max').value || '0', 10);
+  const el = document.getElementById('pctPreview');
+  if (max > 0) { el.textContent = '→ ' + Math.round((qty/max)*100) + '% full (' + qty + ' of ' + max + ')'; }
+  else { el.textContent = ''; }
+}
 async function loadItems() {
   try {
     const res = await fetch(SCRIPT_URL);
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
-    items = data.items.map(i => ({...i, qty: Number(i.qty), min: Number(i.min), id: Number(i.id)}));
+    items = data.items.map(i => ({...i, qty:Number(i.qty), max:Number(i.max)||100, min:Number(i.min), id:Number(i.id)}));
     render();
   } catch(e) {
     showToast('Could not load data — check your URL', true);
@@ -214,27 +234,26 @@ async function apiPost(action, item) {
   const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action, item }) });
   return res.json();
 }
-function isLow(it){ return it.qty <= it.min; }
-function fmtPct(it){ return Math.max(0, Math.min(100, it.qty)); }
+function pct(it)   { return Math.max(0, Math.min(100, Math.round((it.qty / it.max) * 100))); }
+function minPct(it){ return Math.max(0, Math.min(100, Math.round((it.min / it.max) * 100))); }
+function isLow(it) { return it.qty <= it.min; }
 function render(){
   const rowsEl = document.getElementById('rows');
   rowsEl.innerHTML = '';
   document.getElementById('emptyState').style.display = items.length ? 'none' : 'block';
   document.getElementById('statTotal').textContent = items.length;
-  document.getElementById('statLow').textContent = items.filter(isLow).length;
-  document.getElementById('statCats').textContent = new Set(items.map(i=>i.cat)).size;
+  document.getElementById('statLow').textContent   = items.filter(isLow).length;
+  document.getElementById('statCats').textContent  = new Set(items.map(i=>i.cat)).size;
   items.forEach((it, idx) => {
-    const low = isLow(it);
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.style.animationDelay = (idx * 35) + 'ms';
-    row.dataset.id = it.id;
-    row.innerHTML = `
+    const low=isLow(it), p=pct(it), mp=minPct(it);
+    const row=document.createElement('div');
+    row.className='row'; row.style.animationDelay=(idx*35)+'ms'; row.dataset.id=it.id;
+    row.innerHTML=`
       <div class="item-name-cell"><div class="item-name">${esc(it.name)}</div><div class="item-loc">${esc(it.loc)}</div></div>
       <div><span class="cat-pill">${esc(it.cat)}</span></div>
       <div class="gauge-wrap">
-        <div class="gauge-top"><span class="gauge-num">${it.qty}%</span><span class="gauge-min">reorder at ${it.min}%</span></div>
-        <div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${fmtPct(it)}"></div><div class="gauge-marker" data-marker="${it.min}"></div></div>
+        <div class="gauge-top"><span class="gauge-num">${it.qty} / ${it.max}</span><span class="gauge-pct">${p}% &nbsp;·&nbsp; reorder at ${it.min}</span></div>
+        <div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${p}"></div><div class="gauge-marker" data-marker="${mp}"></div></div>
       </div>
       <div><span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span></div>
       <div class="row-actions"><button class="edit-dot" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;
@@ -242,8 +261,8 @@ function render(){
     rowsEl.appendChild(row);
   });
   requestAnimationFrame(()=>{
-    document.querySelectorAll('.gauge-fill').forEach(g=>{ requestAnimationFrame(()=>{ g.style.width = g.dataset.target + '%'; }); });
-    document.querySelectorAll('.gauge-marker').forEach(m=>{ requestAnimationFrame(()=>{ m.style.left = m.dataset.marker + '%'; }); });
+    document.querySelectorAll('.gauge-fill').forEach(g=>{ requestAnimationFrame(()=>{ g.style.width=g.dataset.target+'%'; }); });
+    document.querySelectorAll('.gauge-marker').forEach(m=>{ requestAnimationFrame(()=>{ m.style.left=m.dataset.marker+'%'; }); });
   });
 }
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -256,8 +275,7 @@ function openAdd(){
   document.getElementById('deleteBtn').style.display='none';
   document.getElementById('saveBtn').textContent='Save item';
   document.getElementById('itemForm').reset();
-  document.getElementById('f-qty').value=100;
-  document.getElementById('f-min').value=25;
+  document.getElementById('pctPreview').textContent='';
   openPanel();
   setTimeout(()=>document.getElementById('f-name').focus(),300);
 }
@@ -272,7 +290,9 @@ function openEdit(id){
   document.getElementById('f-cat').value=it.cat;
   document.getElementById('f-loc').value=it.loc;
   document.getElementById('f-qty').value=it.qty;
+  document.getElementById('f-max').value=it.max;
   document.getElementById('f-min').value=it.min;
+  updatePreview();
   openPanel();
 }
 async function save(){
@@ -280,19 +300,19 @@ async function save(){
   const name=document.getElementById('f-name').value.trim();
   const cat=document.getElementById('f-cat').value;
   const loc=document.getElementById('f-loc').value.trim();
-  const qty=Math.max(0,Math.min(100,parseInt(document.getElementById('f-qty').value||'0',10)));
-  const min=Math.max(0,Math.min(100,parseInt(document.getElementById('f-min').value||'0',10)));
+  const qty=Math.max(0,parseInt(document.getElementById('f-qty').value||'0',10));
+  const max=Math.max(1,parseInt(document.getElementById('f-max').value||'1',10));
+  const min=Math.max(0,parseInt(document.getElementById('f-min').value||'0',10));
   if(!name||!loc){ document.getElementById('f-name').focus(); return; }
   setBusy(true);
   try {
     if(editingId){
-      const it=items.find(i=>i.id===editingId);
-      await apiPost('edit',{id:editingId,name,cat,loc,qty,min});
-      Object.assign(it,{name,cat,loc,qty,min});
+      await apiPost('edit',{id:editingId,name,cat,loc,qty,max,min});
+      Object.assign(items.find(i=>i.id===editingId),{name,cat,loc,qty,max,min});
       showToast('Changes saved ✓');
     } else {
-      const res=await apiPost('add',{name,cat,loc,qty,min});
-      items.unshift({id:res.id,name,cat,loc,qty,min});
+      const res=await apiPost('add',{name,cat,loc,qty,max,min});
+      items.unshift({id:res.id,name,cat,loc,qty,max,min});
       showToast('Item added ✓');
     }
     closePanel(); render();
@@ -315,25 +335,24 @@ async function remove(){
 function setBusy(b){
   busy=b;
   ['saveBtn','deleteBtn','cancelBtn'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=b; });
-  document.getElementById('saveBtn').textContent = b ? 'Saving…' : (editingId ? 'Save changes' : 'Save item');
+  document.getElementById('saveBtn').textContent=b?'Saving…':(editingId?'Save changes':'Save item');
 }
 let toastTimer;
-function showToast(msg, isErr=false){
+function showToast(msg,isErr=false){
   const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast'+(isErr?' err':'');
+  t.textContent=msg; t.className='toast'+(isErr?' err':'');
   requestAnimationFrame(()=>{ t.classList.add('show'); });
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
 }
-document.getElementById('openAdd').addEventListener('click', openAdd);
-document.getElementById('closePanel').addEventListener('click', closePanel);
-document.getElementById('cancelBtn').addEventListener('click', closePanel);
-document.getElementById('overlay').addEventListener('click', closePanel);
-document.getElementById('saveBtn').addEventListener('click', save);
-document.getElementById('deleteBtn').addEventListener('click', remove);
-document.getElementById('itemForm').addEventListener('submit', e=>{ e.preventDefault(); save(); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); });
+document.getElementById('openAdd').addEventListener('click',openAdd);
+document.getElementById('closePanel').addEventListener('click',closePanel);
+document.getElementById('cancelBtn').addEventListener('click',closePanel);
+document.getElementById('overlay').addEventListener('click',closePanel);
+document.getElementById('saveBtn').addEventListener('click',save);
+document.getElementById('deleteBtn').addEventListener('click',remove);
+document.getElementById('itemForm').addEventListener('submit',e=>{e.preventDefault();save();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
 </script>
 </body>
 </html>

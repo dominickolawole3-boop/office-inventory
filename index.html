@@ -41,6 +41,7 @@
   .gauge-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px;}
   .gauge-num{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:var(--ink);}
   .gauge-pct{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);}
+  .gauge-min{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);}
   .gauge{height:8px;border-radius:4px;background:var(--line);position:relative;}
   .gauge-fill{height:100%;border-radius:4px;background:var(--ok);width:0%;transition:width .7s cubic-bezier(.2,.8,.2,1),background .4s ease;}
   .gauge-fill.low{background:var(--amber);}
@@ -88,6 +89,20 @@
   .btn-ghost:hover:not(:disabled){background:#fff;color:var(--ink);}
   .btn-danger{background:transparent;color:#A14B2A;border-color:#E9C9B4;}
   .btn-danger:hover:not(:disabled){background:#FBEEE5;}
+  .mode-toggle{display:flex;background:var(--line);border-radius:9px;padding:3px;gap:3px;}
+  .mode-btn{flex:1;padding:8px;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;background:transparent;color:var(--ink-soft);transition:.15s ease;}
+  .mode-btn.active{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,0.1);}
+  .slider-wrap{display:flex;flex-direction:column;gap:10px;}
+  .slider-label{display:flex;justify-content:space-between;align-items:baseline;}
+  .slider-val{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:500;color:var(--ink);}
+  .slider-sub{font-size:11px;color:var(--ink-soft);}
+  input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;background:var(--line);outline:none;cursor:pointer;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--slate-deep);cursor:pointer;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:background .15s;}
+  input[type=range]:hover::-webkit-slider-thumb{background:var(--slate);}
+  .slider-min-wrap{display:flex;align-items:center;gap:10px;margin-top:4px;}
+  .slider-min-wrap label{font-size:12px;font-weight:600;color:var(--ink-soft);white-space:nowrap;}
+  .slider-min-wrap input[type=range]{flex:1;}
+  .slider-min-val{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);min-width:36px;text-align:right;}
   @media(max-width:640px){.top{flex-direction:column;align-items:flex-start;}.add-btn{width:100%;justify-content:center;}.stats{grid-template-columns:1fr;}.list-head{display:none;}.row{grid-template-columns:1fr auto;grid-template-areas:"name actions" "gauge gauge" "status cat";row-gap:8px;}.item-name-cell{grid-area:name;}.gauge-wrap{grid-area:gauge;}.row-actions{grid-area:actions;}}
   @media(prefers-reduced-motion:reduce){*{animation-duration:.001s !important;transition-duration:.001s !important;}}
 </style>
@@ -152,24 +167,42 @@
       </div>
     </div>
     <hr class="divider">
-    <div class="row3">
-      <div class="field">
-        <label for="f-qty">Current qty</label>
-        <input id="f-qty" type="number" min="0" required placeholder="0">
-        <p class="hint">How many now</p>
+    <div class="mode-toggle">
+      <button type="button" class="mode-btn active" id="modeCount" onclick="setMode('count')">🔢 Count</button>
+      <button type="button" class="mode-btn" id="modeSlider" onclick="setMode('slider')">🎚️ Slider</button>
+    </div>
+    <div id="countFields">
+      <div class="row3">
+        <div class="field">
+          <label for="f-qty">Current qty</label>
+          <input id="f-qty" type="number" min="0" placeholder="0">
+          <p class="hint">How many now</p>
+        </div>
+        <div class="field">
+          <label for="f-max">Max qty</label>
+          <input id="f-max" type="number" min="1" placeholder="0">
+          <p class="hint">When fully stocked</p>
+        </div>
+        <div class="field">
+          <label for="f-min">Reorder at</label>
+          <input id="f-min" type="number" min="0" placeholder="0">
+          <p class="hint">Units threshold</p>
+        </div>
       </div>
-      <div class="field">
-        <label for="f-max">Max qty</label>
-        <input id="f-max" type="number" min="1" required placeholder="0">
-        <p class="hint">When fully stocked</p>
+      <div id="pctPreview" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right;margin-top:-8px;"></div>
+    </div>
+    <div id="sliderFields" style="display:none;" class="slider-wrap">
+      <div class="slider-label">
+        <span class="slider-val" id="sliderValDisplay">100%</span>
+        <span class="slider-sub">current stock level</span>
       </div>
-      <div class="field">
-        <label for="f-min">Reorder at</label>
-        <input id="f-min" type="number" min="0" required placeholder="0">
-        <p class="hint">Trigger threshold</p>
+      <input type="range" id="f-slider-qty" min="0" max="100" value="100" oninput="updateSliderDisplay()">
+      <div class="slider-min-wrap">
+        <label for="f-slider-min">Reorder at</label>
+        <input type="range" id="f-slider-min" min="0" max="100" value="25" oninput="updateSliderMinDisplay()">
+        <span class="slider-min-val" id="sliderMinDisplay">25%</span>
       </div>
     </div>
-    <div id="pctPreview" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right;margin-top:-8px;"></div>
   </form>
   <div class="panel-foot">
     <button class="btn btn-danger" id="deleteBtn" style="display:none;">Remove</button>
@@ -179,7 +212,20 @@
 </div>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaesjanebel3Fj8pfa-Y24uzqVByw4O0jSeRXlzPvRREjXRAkAHtVbxJj3902qiRZb1g/exec';
-let items = [], editingId = null, busy = false;
+let items = [], editingId = null, busy = false, currentMode = 'count';
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('countFields').style.display  = mode === 'count'  ? '' : 'none';
+  document.getElementById('sliderFields').style.display = mode === 'slider' ? '' : 'none';
+  document.getElementById('modeCount').classList.toggle('active', mode === 'count');
+  document.getElementById('modeSlider').classList.toggle('active', mode === 'slider');
+}
+function updateSliderDisplay() {
+  document.getElementById('sliderValDisplay').textContent = document.getElementById('f-slider-qty').value + '%';
+}
+function updateSliderMinDisplay() {
+  document.getElementById('sliderMinDisplay').textContent = document.getElementById('f-slider-min').value + '%';
+}
 window.addEventListener('DOMContentLoaded', () => {
   loadItems();
   ['f-qty','f-max'].forEach(id => { document.getElementById(id).addEventListener('input', updatePreview); });
@@ -195,7 +241,7 @@ async function loadItems() {
     const res = await fetch(SCRIPT_URL);
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
-    items = data.items.map(i => ({...i, qty:Number(i.qty), max:Number(i.max)||100, min:Number(i.min), id:Number(i.id)}));
+    items = data.items.map(i => ({...i, qty:Number(i.qty), max:Number(i.max)||100, min:Number(i.min), id:Number(i.id), mode:i.mode||'count'}));
     render();
   } catch(e) {
     showToast('Could not load data — try refreshing', true);
@@ -226,7 +272,10 @@ function render(){
       <div class="item-name-cell"><div class="item-name">${esc(it.name)}</div><div class="item-loc">${esc(it.loc)}</div></div>
       <div><span class="cat-pill">${esc(it.cat)}</span></div>
       <div class="gauge-wrap">
-        <div class="gauge-top"><span class="gauge-num">${it.qty} / ${it.max}</span><span class="gauge-pct">${p}% · reorder at ${it.min}</span></div>
+        <div class="gauge-top">
+          <span class="gauge-num">${it.mode==='slider' ? p+'%' : it.qty+' / '+it.max}</span>
+          <span class="gauge-pct">${it.mode==='slider' ? 'reorder at '+it.min+'%' : p+'% · reorder at '+it.min}</span>
+        </div>
         <div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${p}"></div><div class="gauge-marker" data-marker="${mp}"></div></div>
       </div>
       <div><span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span></div>
@@ -250,6 +299,9 @@ function openAdd(){
   document.getElementById('saveBtn').textContent='Save item';
   document.getElementById('itemForm').reset();
   document.getElementById('pctPreview').textContent='';
+  document.getElementById('f-slider-qty').value=100; updateSliderDisplay();
+  document.getElementById('f-slider-min').value=25; updateSliderMinDisplay();
+  setMode('count');
   openPanel();
   setTimeout(()=>document.getElementById('f-name').focus(),300);
 }
@@ -263,10 +315,17 @@ function openEdit(id){
   document.getElementById('f-name').value=it.name;
   document.getElementById('f-cat').value=it.cat;
   document.getElementById('f-loc').value=it.loc;
-  document.getElementById('f-qty').value=it.qty;
-  document.getElementById('f-max').value=it.max;
-  document.getElementById('f-min').value=it.min;
-  updatePreview();
+  if(it.mode==='slider'){
+    setMode('slider');
+    document.getElementById('f-slider-qty').value=it.qty; updateSliderDisplay();
+    document.getElementById('f-slider-min').value=it.min; updateSliderMinDisplay();
+  } else {
+    setMode('count');
+    document.getElementById('f-qty').value=it.qty;
+    document.getElementById('f-max').value=it.max;
+    document.getElementById('f-min').value=it.min;
+    updatePreview();
+  }
   openPanel();
 }
 async function save(){
@@ -274,19 +333,25 @@ async function save(){
   const name=document.getElementById('f-name').value.trim();
   const cat=document.getElementById('f-cat').value;
   const loc=document.getElementById('f-loc').value.trim();
-  const qty=Math.max(0,parseInt(document.getElementById('f-qty').value||'0',10));
-  const max=Math.max(1,parseInt(document.getElementById('f-max').value||'1',10));
-  const min=Math.max(0,parseInt(document.getElementById('f-min').value||'0',10));
   if(!name||!loc){document.getElementById('f-name').focus();return;}
+  let qty,max,min,mode;
+  if(currentMode==='slider'){
+    qty=parseInt(document.getElementById('f-slider-qty').value,10);
+    max=100; min=parseInt(document.getElementById('f-slider-min').value,10); mode='slider';
+  } else {
+    qty=Math.max(0,parseInt(document.getElementById('f-qty').value||'0',10));
+    max=Math.max(1,parseInt(document.getElementById('f-max').value||'1',10));
+    min=Math.max(0,parseInt(document.getElementById('f-min').value||'0',10)); mode='count';
+  }
   setBusy(true);
   try{
     if(editingId){
-      await apiPost('edit',{id:editingId,name,cat,loc,qty,max,min});
-      Object.assign(items.find(i=>i.id===editingId),{name,cat,loc,qty,max,min});
+      await apiPost('edit',{id:editingId,name,cat,loc,qty,max,min,mode});
+      Object.assign(items.find(i=>i.id===editingId),{name,cat,loc,qty,max,min,mode});
       showToast('Changes saved ✓');
     } else {
-      const res=await apiPost('add',{name,cat,loc,qty,max,min});
-      items.unshift({id:res.id,name,cat,loc,qty,max,min});
+      const res=await apiPost('add',{name,cat,loc,qty,max,min,mode});
+      items.unshift({id:res.id,name,cat,loc,qty,max,min,mode});
       showToast('Item added ✓');
     }
     closePanel(); render();

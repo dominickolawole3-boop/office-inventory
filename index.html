@@ -16,7 +16,6 @@
   body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
   .wrap{max-width:980px;margin:0 auto;padding:48px 28px 100px;}
   .top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;gap:20px;}
-  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);margin:0 0 6px;}
   h1{font-family:'Fraunces',serif;font-weight:560;font-size:42px;margin:0;letter-spacing:-0.01em;}
   .sub{color:var(--ink-soft);font-size:14.5px;margin-top:8px;max-width:46ch;line-height:1.5;}
   .add-btn{font-family:'Inter',sans-serif;background:var(--slate-deep);color:#fff;border:none;border-radius:10px;padding:13px 20px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;transition:transform .18s ease,background .18s ease;}
@@ -115,7 +114,8 @@
 <body>
 <div class="wrap">
   <div class="top">
-    <div>      <h1>Office Inventory</h1>
+    <div>
+      <h1>Office Inventory</h1>
       <p class="sub">What's on the shelf, what's running low, and where to find it.</p>
     </div>
     <button class="add-btn" id="openAdd">
@@ -219,53 +219,19 @@
   </div>
 </div>
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaesjanebel3Fj8pfa-Y24uzqVByw4O0jSeRXlzPvRREjXRAkAHtVbxJj3902qiRZb1g/exec';
-let items = [], editingId = null, busy = false, currentMode = 'count';
-function setMode(mode){
-  currentMode=mode;
-  document.getElementById('countFields').style.display=mode==='count'?'':'none';
-  document.getElementById('sliderFields').style.display=mode==='slider'?'':'none';
-  document.getElementById('modeCount').classList.toggle('active',mode==='count');
-  document.getElementById('modeSlider').classList.toggle('active',mode==='slider');
-}
-function updateSliderDisplay(){ document.getElementById('sliderValDisplay').textContent=document.getElementById('f-slider-qty').value+'%'; }
-function updateSliderMinDisplay(){ document.getElementById('sliderMinDisplay').textContent=document.getElementById('f-slider-min').value+'%'; }
-window.addEventListener('DOMContentLoaded',()=>{
-  loadItems();
-  ['f-qty','f-max'].forEach(id=>{document.getElementById(id).addEventListener('input',updatePreview);});
-});
-function updatePreview(){
-  const qty=parseInt(document.getElementById('f-qty').value||'0',10);
-  const max=parseInt(document.getElementById('f-max').value||'0',10);
-  const el=document.getElementById('pctPreview');
-  el.textContent=max>0?'→ '+Math.round((qty/max)*100)+'% full ('+qty+' of '+max+')':'';
-}
-async function loadItems(){
-  try{
-    const res=await fetch(SCRIPT_URL);
-    const data=await res.json();
-    if(!data.ok) throw new Error(data.error);
-    items=data.items.map(i=>({...i,qty:Number(i.qty),max:Number(i.max)||100,min:Number(i.min),id:Number(i.id),mode:i.mode||'count'}));
-    render();
-  }catch(e){
-    showToast('Could not load data — try refreshing',true);
-    document.getElementById('rows').innerHTML='';
-    document.getElementById('emptyState').style.display='block';
-    document.getElementById('emptyState').textContent='Failed to load — please refresh the page.';
-  }
-}
-async function apiPost(action,item){
-  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action,item})});
-  return res.json();
-}
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzaesjanebel3Fj8pfa-Y24uzqVByw4O0jSeRXlzPvRREjXRAkAHtVbxJj3902qiRZb1g/exec';
+let items=[],editingId=null,busy=false,currentMode='count';
+function setMode(mode){currentMode=mode;document.getElementById('countFields').style.display=mode==='count'?'':'none';document.getElementById('sliderFields').style.display=mode==='slider'?'':'none';document.getElementById('modeCount').classList.toggle('active',mode==='count');document.getElementById('modeSlider').classList.toggle('active',mode==='slider');}
+function updateSliderDisplay(){document.getElementById('sliderValDisplay').textContent=document.getElementById('f-slider-qty').value+'%';}
+function updateSliderMinDisplay(){document.getElementById('sliderMinDisplay').textContent=document.getElementById('f-slider-min').value+'%';}
+window.addEventListener('DOMContentLoaded',()=>{loadItems();['f-qty','f-max'].forEach(id=>{document.getElementById(id).addEventListener('input',updatePreview);});});
+function updatePreview(){const qty=parseInt(document.getElementById('f-qty').value||'0',10);const max=parseInt(document.getElementById('f-max').value||'0',10);const el=document.getElementById('pctPreview');el.textContent=max>0?'→ '+Math.round((qty/max)*100)+'% full ('+qty+' of '+max+')':''}
+async function loadItems(){try{const res=await fetch(SCRIPT_URL);const data=await res.json();if(!data.ok)throw new Error(data.error);items=data.items.map(i=>({...i,qty:Number(i.qty),max:Number(i.max)||100,min:Number(i.min),id:Number(i.id),mode:i.mode||'count'}));render();}catch(e){showToast('Could not load data — try refreshing',true);document.getElementById('rows').innerHTML='';document.getElementById('emptyState').style.display='block';document.getElementById('emptyState').textContent='Failed to load — please refresh the page.';}}
+async function apiPost(action,item){const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action,item})});return res.json();}
 function pct(it){return Math.max(0,Math.min(100,Math.round((it.qty/it.max)*100)));}
 function minPct(it){return Math.max(0,Math.min(100,Math.round((it.min/it.max)*100)));}
 function isLow(it){return it.qty<=it.min;}
-function filterItems(){
-  const q=document.getElementById('searchInput').value.trim().toLowerCase();
-  const filtered=q?items.filter(it=>it.name.toLowerCase().includes(q)||it.cat.toLowerCase().includes(q)||it.loc.toLowerCase().includes(q)):items;
-  renderList(filtered,q);
-}
+function filterItems(){const q=document.getElementById('searchInput').value.trim().toLowerCase();const filtered=q?items.filter(it=>it.name.toLowerCase().includes(q)||it.cat.toLowerCase().includes(q)||it.loc.toLowerCase().includes(q)):items;renderList(filtered,q);}
 function render(){filterItems();}
 function renderList(filtered,q=''){
   const rowsEl=document.getElementById('rows');
@@ -274,130 +240,36 @@ function renderList(filtered,q=''){
   document.getElementById('statTotal').textContent=items.length;
   document.getElementById('statLow').textContent=items.filter(isLow).length;
   document.getElementById('statCats').textContent=new Set(items.map(i=>i.cat)).size;
-  if(items.length>0&&filtered.length===0){
-    rowsEl.innerHTML='<div class="no-results">No items match "<strong>'+q+'</strong>"</div>';
-    return;
-  }
-  filtered.forEach((it,idx)=>{
+  if(items.length>0&&filtered.length===0){rowsEl.innerHTML='<div class="no-results">No items match "<strong>'+q+'</strong>"</div>';return;}
+  const sorted=[...filtered].sort((a,b)=>isLow(b)-isLow(a));
+  sorted.forEach((it,idx)=>{
     const low=isLow(it),p=pct(it),mp=minPct(it);
     const row=document.createElement('div');
-    row.className='row'; row.style.animationDelay=(idx*35)+'ms'; row.dataset.id=it.id;
+    row.className='row';row.style.animationDelay=(idx*35)+'ms';row.dataset.id=it.id;
     row.innerHTML=`
       <div class="item-name-cell"><div class="item-name">${esc(it.name)}</div><div class="item-loc">${esc(it.loc)}</div></div>
       <div><span class="cat-pill">${esc(it.cat)}</span></div>
       <div class="gauge-wrap">
-        <div class="gauge-top">
-          <span class="gauge-num">${it.mode==='slider'?p+'%':it.qty+' / '+it.max}</span>
-          <span class="gauge-pct">${it.mode==='slider'?'reorder at '+it.min+'%':p+'% · reorder at '+it.min}</span>
-        </div>
+        <div class="gauge-top"><span class="gauge-num">${it.mode==='slider'?p+'%':it.qty+' / '+it.max}</span><span class="gauge-pct">${it.mode==='slider'?'reorder at '+it.min+'%':p+'% · reorder at '+it.min}</span></div>
         <div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${p}"></div><div class="gauge-marker" data-marker="${mp}"></div></div>
       </div>
       <div><span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span></div>
-      <div class="row-actions"><button class="edit-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;
+      <div class="row-actions"><button class="edit-dot" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;
     row.addEventListener('click',()=>openEdit(it.id));
     rowsEl.appendChild(row);
   });
-  requestAnimationFrame(()=>{
-    document.querySelectorAll('.gauge-fill').forEach(g=>{requestAnimationFrame(()=>{g.style.width=g.dataset.target+'%';});});
-    document.querySelectorAll('.gauge-marker').forEach(m=>{requestAnimationFrame(()=>{m.style.left=m.dataset.marker+'%';});});
-  });
+  requestAnimationFrame(()=>{document.querySelectorAll('.gauge-fill').forEach(g=>{requestAnimationFrame(()=>{g.style.width=g.dataset.target+'%';});});document.querySelectorAll('.gauge-marker').forEach(m=>{requestAnimationFrame(()=>{m.style.left=m.dataset.marker+'%';});});});
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function openPanel(){document.getElementById('overlay').classList.add('show');document.getElementById('panel').classList.add('show');}
 function closePanel(){document.getElementById('overlay').classList.remove('show');document.getElementById('panel').classList.remove('show');editingId=null;}
-function openAdd(){
-  editingId=null;
-  document.getElementById('panelTitle').textContent='Add item';
-  document.getElementById('panelSub').textContent='New entry for the supply room';
-  document.getElementById('deleteBtn').style.display='none';
-  document.getElementById('saveBtn').textContent='Save item';
-  document.getElementById('itemForm').reset();
-  document.getElementById('pctPreview').textContent='';
-  document.getElementById('f-slider-qty').value=100; updateSliderDisplay();
-  document.getElementById('f-slider-min').value=25; updateSliderMinDisplay();
-  setMode('count');
-  openPanel();
-  setTimeout(()=>document.getElementById('f-name').focus(),300);
-}
-function openEdit(id){
-  const it=items.find(i=>i.id===id); if(!it) return;
-  editingId=id;
-  document.getElementById('panelTitle').textContent='Edit item';
-  document.getElementById('panelSub').textContent=it.name;
-  document.getElementById('deleteBtn').style.display='block';
-  document.getElementById('saveBtn').textContent='Save changes';
-  document.getElementById('f-name').value=it.name;
-  document.getElementById('f-cat').value=it.cat;
-  document.getElementById('f-loc').value=it.loc;
-  if(it.mode==='slider'){
-    setMode('slider');
-    document.getElementById('f-slider-qty').value=it.qty; updateSliderDisplay();
-    document.getElementById('f-slider-min').value=it.min; updateSliderMinDisplay();
-  }else{
-    setMode('count');
-    document.getElementById('f-qty').value=it.qty;
-    document.getElementById('f-max').value=it.max;
-    document.getElementById('f-min').value=it.min;
-    updatePreview();
-  }
-  openPanel();
-}
-async function save(){
-  if(busy) return;
-  const name=document.getElementById('f-name').value.trim();
-  const cat=document.getElementById('f-cat').value;
-  const loc=document.getElementById('f-loc').value.trim();
-  if(!name||!loc){document.getElementById('f-name').focus();return;}
-  let qty,max,min,mode;
-  if(currentMode==='slider'){
-    qty=parseInt(document.getElementById('f-slider-qty').value,10);
-    max=100; min=parseInt(document.getElementById('f-slider-min').value,10); mode='slider';
-  }else{
-    qty=Math.max(0,parseInt(document.getElementById('f-qty').value||'0',10));
-    max=Math.max(1,parseInt(document.getElementById('f-max').value||'1',10));
-    min=Math.max(0,parseInt(document.getElementById('f-min').value||'0',10)); mode='count';
-  }
-  setBusy(true);
-  try{
-    if(editingId){
-      await apiPost('edit',{id:editingId,name,cat,loc,qty,max,min,mode});
-      Object.assign(items.find(i=>i.id===editingId),{name,cat,loc,qty,max,min,mode});
-      showToast('Changes saved ✓');
-    }else{
-      const res=await apiPost('add',{name,cat,loc,qty,max,min,mode});
-      items.unshift({id:res.id,name,cat,loc,qty,max,min,mode});
-      showToast('Item added ✓');
-    }
-    closePanel(); render();
-  }catch(e){showToast('Save failed — try again',true);}
-  setBusy(false);
-}
-async function remove(){
-  if(busy||!editingId) return;
-  setBusy(true);
-  try{
-    await apiPost('delete',{id:editingId});
-    const el=document.querySelector(`.row[data-id="${editingId}"]`);
-    items=items.filter(i=>i.id!==editingId);
-    closePanel();
-    if(el){el.classList.add('leaving');setTimeout(render,260);}else{render();}
-    showToast('Item removed');
-  }catch(e){showToast('Delete failed — try again',true);}
-  setBusy(false);
-}
-function setBusy(b){
-  busy=b;
-  ['saveBtn','deleteBtn','cancelBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=b;});
-  document.getElementById('saveBtn').textContent=b?'Saving…':(editingId?'Save changes':'Save item');
-}
+function openAdd(){editingId=null;document.getElementById('panelTitle').textContent='Add item';document.getElementById('panelSub').textContent='New entry for the supply room';document.getElementById('deleteBtn').style.display='none';document.getElementById('saveBtn').textContent='Save item';document.getElementById('itemForm').reset();document.getElementById('pctPreview').textContent='';document.getElementById('f-slider-qty').value=100;updateSliderDisplay();document.getElementById('f-slider-min').value=25;updateSliderMinDisplay();setMode('count');openPanel();setTimeout(()=>document.getElementById('f-name').focus(),300);}
+function openEdit(id){const it=items.find(i=>i.id===id);if(!it)return;editingId=id;document.getElementById('panelTitle').textContent='Edit item';document.getElementById('panelSub').textContent=it.name;document.getElementById('deleteBtn').style.display='block';document.getElementById('saveBtn').textContent='Save changes';document.getElementById('f-name').value=it.name;document.getElementById('f-cat').value=it.cat;document.getElementById('f-loc').value=it.loc;if(it.mode==='slider'){setMode('slider');document.getElementById('f-slider-qty').value=it.qty;updateSliderDisplay();document.getElementById('f-slider-min').value=it.min;updateSliderMinDisplay();}else{setMode('count');document.getElementById('f-qty').value=it.qty;document.getElementById('f-max').value=it.max;document.getElementById('f-min').value=it.min;updatePreview();}openPanel();}
+async function save(){if(busy)return;const name=document.getElementById('f-name').value.trim();const cat=document.getElementById('f-cat').value;const loc=document.getElementById('f-loc').value.trim();if(!name||!loc){document.getElementById('f-name').focus();return;}let qty,max,min,mode;if(currentMode==='slider'){qty=parseInt(document.getElementById('f-slider-qty').value,10);max=100;min=parseInt(document.getElementById('f-slider-min').value,10);mode='slider';}else{qty=Math.max(0,parseInt(document.getElementById('f-qty').value||'0',10));max=Math.max(1,parseInt(document.getElementById('f-max').value||'1',10));min=Math.max(0,parseInt(document.getElementById('f-min').value||'0',10));mode='count';}setBusy(true);try{if(editingId){await apiPost('edit',{id:editingId,name,cat,loc,qty,max,min,mode});Object.assign(items.find(i=>i.id===editingId),{name,cat,loc,qty,max,min,mode});showToast('Changes saved ✓');}else{const res=await apiPost('add',{name,cat,loc,qty,max,min,mode});items.unshift({id:res.id,name,cat,loc,qty,max,min,mode});showToast('Item added ✓');}closePanel();render();}catch(e){showToast('Save failed — try again',true);}setBusy(false);}
+async function remove(){if(busy||!editingId)return;setBusy(true);try{await apiPost('delete',{id:editingId});const el=document.querySelector(`.row[data-id="${editingId}"]`);items=items.filter(i=>i.id!==editingId);closePanel();if(el){el.classList.add('leaving');setTimeout(render,260);}else{render();}showToast('Item removed');}catch(e){showToast('Delete failed — try again',true);}setBusy(false);}
+function setBusy(b){busy=b;['saveBtn','deleteBtn','cancelBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=b;});document.getElementById('saveBtn').textContent=b?'Saving…':(editingId?'Save changes':'Save item');}
 let toastTimer;
-function showToast(msg,isErr=false){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast'+(isErr?' err':'');
-  requestAnimationFrame(()=>{t.classList.add('show');});
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
-}
+function showToast(msg,isErr=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(isErr?' err':'');requestAnimationFrame(()=>{t.classList.add('show');});clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);}
 document.getElementById('openAdd').addEventListener('click',openAdd);
 document.getElementById('closePanel').addEventListener('click',closePanel);
 document.getElementById('cancelBtn').addEventListener('click',closePanel);

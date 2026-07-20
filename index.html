@@ -107,6 +107,20 @@
   .slider-min-wrap label{font-size:12px;font-weight:600;color:var(--ink-soft);white-space:nowrap;}
   .slider-min-wrap input[type=range]{flex:1;}
   .slider-min-val{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);min-width:36px;text-align:right;}
+  .help-btn{position:fixed;top:20px;left:20px;width:34px;height:34px;border-radius:50%;background:var(--slate-deep);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,0.18);transition:background .15s,transform .15s;}
+  .help-btn:hover{background:var(--slate);transform:scale(1.08);}
+  .help-modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .help-modal.hidden{display:none;}
+  .help-backdrop{position:absolute;inset:0;background:rgba(34,40,31,0.4);}
+  .help-box{position:relative;background:#fff;border-radius:16px;padding:32px 36px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px -10px rgba(0,0,0,0.25);}
+  .help-box h2{font-family:'Fraunces',serif;font-size:22px;font-weight:560;margin:0 0 20px;color:var(--ink);}
+  .help-box h3{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin:20px 0 8px;}
+  .help-box h3:first-of-type{margin-top:0;}
+  .help-box ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+  .help-box li{font-size:13.5px;line-height:1.55;color:var(--ink);}
+  .help-box li strong{color:var(--slate-deep);}
+  .help-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-soft);line-height:1;padding:4px 8px;border-radius:6px;transition:.15s;}
+  .help-close:hover{background:var(--line);}
   @media(max-width:640px){.top{flex-direction:column;align-items:flex-start;}.add-btn{width:100%;justify-content:center;}.stats{grid-template-columns:1fr;}.list-head{display:none;}.row{grid-template-columns:1fr auto;grid-template-areas:"name actions" "gauge gauge" "status cat";row-gap:8px;}.item-name-cell{grid-area:name;}.gauge-wrap{grid-area:gauge;}.row-actions{grid-area:actions;}}
   @media(prefers-reduced-motion:reduce){*{animation-duration:.001s !important;transition-duration:.001s !important;}}
 </style>
@@ -142,6 +156,36 @@
   </div>
   <div class="empty" id="emptyState" style="display:none;">No items yet — add your first one.</div>
 </div>
+<button class="help-btn" onclick="document.getElementById('helpModal').classList.remove('hidden')" title="Help">?</button>
+
+<div class="help-modal hidden" id="helpModal">
+  <div class="help-backdrop" onclick="document.getElementById('helpModal').classList.add('hidden')"></div>
+  <div class="help-box">
+    <button class="help-close" onclick="document.getElementById('helpModal').classList.add('hidden')">&times;</button>
+    <h2>Quick Guide</h2>
+    <h3>Adding an Item</h3>
+    <ul>
+      <li>Click <strong>+ Add item</strong> in the top right</li>
+      <li>Enter the item name, category, and where it's stored</li>
+      <li>Choose <strong>Count</strong> (qty / max / reorder) or <strong>Slider</strong> (drag to show roughly how full it is)</li>
+      <li>Click <strong>Save item</strong> — saves to the shared sheet instantly</li>
+    </ul>
+    <h3>Finding an Item</h3>
+    <ul>
+      <li>Type in the <strong>search bar</strong> at the top of the list</li>
+      <li>Search works by item name, category, or location</li>
+      <li>Items needing reorder appear <strong>at the top</strong> automatically in amber</li>
+    </ul>
+    <h3>Editing an Item</h3>
+    <ul>
+      <li>Click anywhere on the item's row to open the edit panel</li>
+      <li>Update any field — name, location, stock level, or reorder threshold</li>
+      <li>Click <strong>Save changes</strong> — updates for everyone immediately</li>
+      <li>To remove an item entirely, click <strong>Remove</strong> at the bottom of the panel</li>
+    </ul>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div class="overlay" id="overlay"></div>
 <div class="panel" id="panel">

@@ -183,7 +183,7 @@ input[type=range]:hover::-webkit-slider-thumb{background:var(--slate);}
 </div></div>
 <script>
 var SCRIPT_URL="https://script.google.com/macros/s/AKfycbzaesjanebel3Fj8pfa-Y24uzqVByw4O0jSeRXlzPvRREjXRAkAHtVbxJj3902qiRZb1g/exec";
-var DEFAULT_LOCATIONS=["Andrea's workstation","Cab A","Caitlyn's office","Dave's office","Dom's workstation","Dorothy's office","Downstairs kitchen","Heather and Patricia's office","Jess's office","Jess's workstation","Kitchen","Lobby","Malavika and Andrea's office","Malavika's workstation","Maritza's office","Murray's office","Olivia and Bogic's office","Reception","Sujany and Daniela's office","Upstairs kitchen"];
+var DEFAULT_LOCATIONS=["Cab A","Caitlyn's office","Dave's office","Dorothy's office","Downstairs kitchen","Heather and Patricia's office","Jess's office","Kitchen","Lobby","Malavika and Andrea's office","Maritza's office","Murray's office","Olivia and Bogic's office","Reception","Sujany and Daniela's office","Upstairs kitchen"];
 var items=[],editingId=null,busy=false,currentMode="count",currentLocPage=null,_ft=null;
 function debounceFilter(){clearTimeout(_ft);_ft=setTimeout(filterItems,180);}
 function setMode(m){currentMode=m;document.getElementById("countFields").style.display=m==="count"?"":"none";document.getElementById("sliderFields").style.display=m==="slider"?"":"none";document.getElementById("modeCount").classList.toggle("active",m==="count");document.getElementById("modeSlider").classList.toggle("active",m==="slider");}

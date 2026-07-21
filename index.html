@@ -217,7 +217,8 @@
       </div>
       <div class="field">
         <label for="f-loc">Location</label>
-        <input id="f-loc" required placeholder="e.g. Shelf B2">
+        <input id="f-loc" required placeholder="e.g. Shelf B2" list="locationList" autocomplete="off">
+        <datalist id="locationList"></datalist>
       </div>
     </div>
     <hr class="divider">
@@ -272,8 +273,13 @@ function updateSliderDisplay(){document.getElementById('sliderValDisplay').textC
 function updateSliderMinDisplay(){document.getElementById('sliderMinDisplay').textContent=document.getElementById('f-slider-min').value+'%';}
 window.addEventListener('DOMContentLoaded',()=>{loadItems();['f-qty','f-max'].forEach(id=>{document.getElementById(id).addEventListener('input',updatePreview);});});
 function updatePreview(){const qty=parseInt(document.getElementById('f-qty').value||'0',10);const max=parseInt(document.getElementById('f-max').value||'0',10);const el=document.getElementById('pctPreview');el.textContent=max>0?'→ '+Math.round((qty/max)*100)+'% full ('+qty+' of '+max+')':''}
-async function loadItems(){try{const res=await fetch(SCRIPT_URL);const data=await res.json();if(!data.ok)throw new Error(data.error);items=data.items.map(i=>({...i,qty:Number(i.qty),max:Number(i.max)||100,min:Number(i.min),id:Number(i.id),mode:i.mode||'count'}));render();}catch(e){showToast('Could not load data — try refreshing',true);document.getElementById('rows').innerHTML='';document.getElementById('emptyState').style.display='block';document.getElementById('emptyState').textContent='Failed to load — please refresh the page.';}}
+async function loadItems(){try{const res=await fetch(SCRIPT_URL);const data=await res.json();if(!data.ok)throw new Error(data.error);items=data.items.map(i=>({...i,qty:Number(i.qty),max:Number(i.max)||100,min:Number(i.min),id:Number(i.id),mode:i.mode||'count'}));updateLocationList();render();}catch(e){showToast('Could not load data — try refreshing',true);document.getElementById('rows').innerHTML='';document.getElementById('emptyState').style.display='block';document.getElementById('emptyState').textContent='Failed to load — please refresh the page.';}}
 async function apiPost(action,item){const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action,item})});return res.json();}
+function updateLocationList(){
+  const locs=[...new Set(items.map(i=>i.loc).filter(Boolean))].sort();
+  const dl=document.getElementById('locationList');
+  dl.innerHTML=locs.map(l=>'<option value="'+l.replace(/"/g,'&quot;')+'">').join('');
+}
 function pct(it){return Math.max(0,Math.min(100,Math.round((it.qty/it.max)*100)));}
 function minPct(it){return Math.max(0,Math.min(100,Math.round((it.min/it.max)*100)));}
 function isLow(it){return it.qty<=it.min;}

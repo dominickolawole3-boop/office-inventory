@@ -392,7 +392,37 @@ let _ft=null;
 function debounceFilter(){clearTimeout(_ft);_ft=setTimeout(filterItems,180);}
 function showMainPage(){currentLocPage=null;['mainPage','locationsPage','locationDetailPage'].forEach(id=>{document.getElementById(id).classList.toggle('active',id==='mainPage');});}
 function showLocationsPage(){currentLocPage=null;['mainPage','locationsPage','locationDetailPage'].forEach(id=>{document.getElementById(id).classList.toggle('active',id==='locationsPage');});const locs=[...new Set(items.map(i=>i.loc).filter(Boolean))].sort((a,b)=>a.localeCompare(b));document.getElementById('locationGrid').innerHTML=locs.map(loc=>{const li=items.filter(i=>i.loc===loc);const low=li.filter(isLow).length;return '<div class="loc-card" onclick="showLocationDetail(''+loc.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'')">'+'<div class="loc-card-name">'+esc(loc)+'</div>'+'<div class="loc-card-count">'+li.length+' item'+(li.length!==1?'s':'')+'</div>'+(low?'<div class="loc-card-low">'+low+' need reorder</div>':'')+'</div>';}).join('');}
-function showLocationDetail(loc){currentLocPage=loc;['mainPage','locationsPage','locationDetailPage'].forEach(id=>{document.getElementById(id).classList.toggle('active',id==='locationDetailPage');});document.getElementById('detailLocName').textContent=loc;const li=[...items.filter(i=>i.loc===loc)].sort((a,b)=>isLow(b)-isLow(a));document.getElementById('detailLocCount').textContent=li.length+' item'+(li.length!==1?'s':'')+(li.filter(isLow).length?' · '+li.filter(isLow).length+' need reorder':'');document.getElementById('detailEmpty').style.display=li.length?'none':'block';const dr=document.getElementById('detailRows');dr.innerHTML='';li.forEach((it,idx)=>{const low=isLow(it),p=pct(it),mp=minPct(it);const row=document.createElement('div');row.className='row';row.style.animationDelay=(idx*35)+'ms';row.dataset.id=it.id;row.innerHTML=`<div class="item-name-cell"><div class="item-name">${esc(it.name)}</div></div><div><span class="cat-pill">${esc(it.cat)}</span></div><div class="gauge-wrap"><div class="gauge-top"><span class="gauge-num">${it.mode==='slider'?p+'%':it.qty+' / '+it.max}</span><span class="gauge-pct">${it.mode==='slider'?'reorder at '+it.min+'%':p+'% · reorder at '+it.min}</span></div><div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${p}"></div><div class="gauge-marker" data-marker="${mp}"></div></div></div><div><span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span></div><div class="row-actions"><button class="edit-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;row.addEventListener('click',()=>openEdit(it.id));dr.appendChild(row);});requestAnimationFrame(()=>{dr.querySelectorAll('.gauge-fill').forEach(g=>{requestAnimationFrame(()=>{g.style.width=g.dataset.target+'%';});});dr.querySelectorAll('.gauge-marker').forEach(m=>{requestAnimationFrame(()=>{m.style.left=m.dataset.marker+'%';});});});document.getElementById('addToLocBtn').onclick=()=>{openAdd();setTimeout(()=>{document.getElementById('f-loc').value=loc;},350);};}
+function showLocationDetail(loc){
+  currentLocPage=loc;
+  ['mainPage','locationsPage','locationDetailPage'].forEach(function(id){document.getElementById(id).classList.toggle('active',id==='locationDetailPage');});
+  document.getElementById('detailLocName').textContent=loc;
+  var li=[].concat(items.filter(function(i){return i.loc===loc;})).sort(function(a,b){return isLow(b)-isLow(a);});
+  var lowCount=li.filter(isLow).length;
+  document.getElementById('detailLocCount').textContent=li.length+' item'+(li.length!==1?'s':'')+(lowCount?' · '+lowCount+' need reorder':'');
+  document.getElementById('detailEmpty').style.display=li.length?'none':'block';
+  var dr=document.getElementById('detailRows');dr.innerHTML='';
+  li.forEach(function(it,idx){
+    var low=isLow(it),p=pct(it),mp=minPct(it);
+    var row=document.createElement('div');
+    row.className='row';row.style.animationDelay=(idx*35)+'ms';row.dataset.id=it.id;
+    row.innerHTML='<div class="item-name-cell"><div class="item-name">'+esc(it.name)+'</div></div>'
+      +'<div><span class="cat-pill">'+esc(it.cat)+'</span></div>'
+      +'<div class="gauge-wrap"><div class="gauge-top">'
+      +'<span class="gauge-num">'+(it.mode==='slider'?p+'%':it.qty+' / '+it.max)+'</span>'
+      +'<span class="gauge-pct">'+(it.mode==='slider'?'reorder at '+it.min+'%':p+'% · reorder at '+it.min)+'</span>'
+      +'</div><div class="gauge"><div class="gauge-fill '+(low?'low':'')+'" data-target="'+p+'"></div>'
+      +'<div class="gauge-marker" data-marker="'+mp+'"></div></div></div>'
+      +'<div><span class="status '+(low?'low':'ok')+'"><span class="dot"></span>'+(low?'Reorder':'Stocked')+'</span></div>'
+      +'<div class="row-actions"><button class="edit-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>';
+    row.addEventListener('click',function(){openEdit(it.id);});
+    dr.appendChild(row);
+  });
+  requestAnimationFrame(function(){
+    dr.querySelectorAll('.gauge-fill').forEach(function(g){requestAnimationFrame(function(){g.style.width=g.dataset.target+'%';});});
+    dr.querySelectorAll('.gauge-marker').forEach(function(m){requestAnimationFrame(function(){m.style.left=m.dataset.marker+'%';});});
+  });
+  document.getElementById('addToLocBtn').onclick=function(){openAdd();setTimeout(function(){document.getElementById('f-loc').value=loc;},350);};
+}
 document.getElementById('openAdd').addEventListener('click',openAdd);
 document.getElementById('closePanel').addEventListener('click',closePanel);
 document.getElementById('cancelBtn').addEventListener('click',closePanel);

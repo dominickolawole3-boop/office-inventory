@@ -276,18 +276,37 @@ function updatePreview(){const qty=parseInt(document.getElementById('f-qty').val
 async function loadItems(){try{const res=await fetch(SCRIPT_URL);const data=await res.json();if(!data.ok)throw new Error(data.error);items=data.items.map(i=>({...i,qty:Number(i.qty),max:Number(i.max)||100,min:Number(i.min),id:Number(i.id),mode:i.mode||'count'}));updateLocationList();render();}catch(e){showToast('Could not load data — try refreshing',true);document.getElementById('rows').innerHTML='';document.getElementById('emptyState').style.display='block';document.getElementById('emptyState').textContent='Failed to load — please refresh the page.';}}
 async function apiPost(action,item){const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action,item})});return res.json();}
 const DEFAULT_LOCATIONS=[
+  "Andrea's workstation",
+  "Cab A",
   "Caitlyn's office",
   "Dave's office",
+  "Dom's workstation",
   "Dorothy's office",
+  "Downstairs kitchen",
   "Heather and Patricia's office",
+  "Jess's office",
+  "Jess's workstation",
+  "Kitchen",
+  "Lobby",
+  "Malavika and Andrea's office",
+  "Malavika's workstation",
   "Maritza's office",
   "Murray's office",
   "Olivia and Bogic's office",
-  "Sujany and Daniela's office"
+  "Reception",
+  "Sujany and Daniela's office",
+  "Upstairs kitchen"
 ];
 function updateLocationList(){
   const fromItems=items.map(i=>i.loc).filter(Boolean);
-  const all=[...new Set([...DEFAULT_LOCATIONS,...fromItems])].sort((a,b)=>a.localeCompare(b));
+  // Merge defaults + item locations, deduplicating case+space insensitively
+  // Prefer the canonical name from DEFAULT_LOCATIONS when there's a clash
+  const seen=new Map();
+  [...DEFAULT_LOCATIONS,...fromItems].forEach(l=>{
+    const key=l.toLowerCase().replace(/\s+/g,' ').trim();
+    if(!seen.has(key)) seen.set(key,l);
+  });
+  const all=[...seen.values()].sort((a,b)=>a.localeCompare(b));
   const dl=document.getElementById('locationList');
   dl.innerHTML=all.map(l=>'<option value="'+l.replace(/"/g,'&quot;')+'">').join('');
 }

@@ -21,7 +21,7 @@
   .add-btn{font-family:'Inter',sans-serif;background:var(--slate-deep);color:#fff;border:none;border-radius:10px;padding:13px 20px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px;transition:transform .18s ease,background .18s ease;}
   .add-btn:hover{background:var(--slate);transform:translateY(-1px);}
   .add-btn svg{width:15px;height:15px;}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:32px 0 36px;}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:32px 0 36px;}
   .stat{background:var(--card);padding:18px 20px;}
   .stat .n{font-family:'Fraunces',serif;font-size:28px;font-weight:560;line-height:1;}
   .stat .l{font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.02em;}
@@ -121,6 +121,21 @@
   .help-box li strong{color:var(--slate-deep);}
   .help-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-soft);line-height:1;padding:4px 8px;border-radius:6px;transition:.15s;}
   .help-close:hover{background:var(--line);}
+  .stat.clickable{cursor:pointer;}
+  .stat.clickable:hover{background:#f0ede6;}
+  .loc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .loc-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;cursor:pointer;transition:box-shadow .2s,border-color .2s;}
+  .loc-card:hover{box-shadow:var(--shadow);border-color:#cfc8b5;}
+  .loc-card-name{font-weight:600;font-size:15px;color:var(--ink);margin-bottom:6px;}
+  .loc-card-count{font-size:13px;color:var(--ink-soft);}
+  .loc-card-low{font-size:12px;color:var(--amber);font-weight:600;margin-top:4px;}
+  .breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:28px;}
+  .breadcrumb .bc-back{color:var(--slate);cursor:pointer;font-weight:600;}
+  .breadcrumb .bc-back:hover{text-decoration:underline;}
+  .breadcrumb .bc-sep{color:var(--line);}
+  .breadcrumb .bc-cur{color:var(--ink);font-weight:600;}
+  .page{display:none;}
+  .page.active{display:block;}
   @media(max-width:640px){.top{flex-direction:column;align-items:flex-start;}.add-btn{width:100%;justify-content:center;}.stats{grid-template-columns:1fr;}.list-head{display:none;}.row{grid-template-columns:1fr auto;grid-template-areas:"name actions" "gauge gauge" "status cat";row-gap:8px;}.item-name-cell{grid-area:name;}.gauge-wrap{grid-area:gauge;}.row-actions{grid-area:actions;}}
   @media(prefers-reduced-motion:reduce){*{animation-duration:.001s !important;transition-duration:.001s !important;}}
 </style>
@@ -141,7 +156,9 @@
     <div class="stat"><div class="n" id="statTotal">—</div><div class="l">items tracked</div></div>
     <div class="stat low"><div class="n" id="statLow">—</div><div class="l">running low</div></div>
     <div class="stat"><div class="n" id="statCats">—</div><div class="l">categories</div></div>
+    <div class="stat clickable" onclick="showLocationsPage()"><div class="n" id="statLocs">—</div><div class="l">locations</div></div>
   </div>
+  <div id="mainPage" class="page active">
   <div class="search-wrap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input id="searchInput" type="text" placeholder="Search items, categories, locations…" oninput="filterItems()">
@@ -322,6 +339,8 @@ function renderList(filtered,q=''){
   document.getElementById('statTotal').textContent=items.length;
   document.getElementById('statLow').textContent=items.filter(isLow).length;
   document.getElementById('statCats').textContent=new Set(items.map(i=>i.cat)).size;
+  document.getElementById('statLocs').textContent=new Set(items.map(i=>i.loc).filter(Boolean)).size;
+  if(currentLocPage) showLocationDetail(currentLocPage);
   if(items.length>0&&filtered.length===0){rowsEl.innerHTML='<div class="no-results">No items match "<strong>'+q+'</strong>"</div>';return;}
   const sorted=[...filtered].sort((a,b)=>isLow(b)-isLow(a));
   sorted.forEach((it,idx)=>{
@@ -369,6 +388,10 @@ async function remove(){if(busy||!editingId)return;setBusy(true);try{await apiPo
 function setBusy(b){busy=b;['saveBtn','deleteBtn','cancelBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=b;});document.getElementById('saveBtn').textContent=b?'Saving…':(editingId?'Save changes':'Save item');}
 let toastTimer;
 function showToast(msg,isErr=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(isErr?' err':'');requestAnimationFrame(()=>{t.classList.add('show');});clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);}
+let currentLocPage=null;
+function showMainPage(){currentLocPage=null;['mainPage','locationsPage','locationDetailPage'].forEach(id=>{document.getElementById(id).classList.toggle('active',id==='mainPage');});}
+function showLocationsPage(){currentLocPage=null;['mainPage','locationsPage','locationDetailPage'].forEach(id=>{document.getElementById(id).classList.toggle('active',id==='locationsPage');});const locs=[...new Set(items.map(i=>i.loc).filter(Boolean))].sort((a,b)=>a.localeCompare(b));document.getElementById('locationGrid').innerHTML=locs.map(loc=>{const li=items.filter(i=>i.loc===loc);const low=li.filter(isLow).length;return '<div class="loc-card" onclick="showLocationDetail(''+loc.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'')">'+'<div class="loc-card-name">'+esc(loc)+'</div>'+'<div class="loc-card-count">'+li.length+' item'+(li.length!==1?'s':'')+'</div>'+(low?'<div class="loc-card-low">'+low+' need reorder</div>':'')+'</div>';}).join('');}
+function showLocationDetail(loc){currentLocPage=loc;['mainPage','locationsPage','locationDetailPage'].forEach(id=>{document.getElementById(id).classList.toggle('active',id==='locationDetailPage');});document.getElementById('detailLocName').textContent=loc;const li=[...items.filter(i=>i.loc===loc)].sort((a,b)=>isLow(b)-isLow(a));document.getElementById('detailLocCount').textContent=li.length+' item'+(li.length!==1?'s':'')+(li.filter(isLow).length?' · '+li.filter(isLow).length+' need reorder':'');document.getElementById('detailEmpty').style.display=li.length?'none':'block';const dr=document.getElementById('detailRows');dr.innerHTML='';li.forEach((it,idx)=>{const low=isLow(it),p=pct(it),mp=minPct(it);const row=document.createElement('div');row.className='row';row.style.animationDelay=(idx*35)+'ms';row.dataset.id=it.id;row.innerHTML=`<div class="item-name-cell"><div class="item-name">${esc(it.name)}</div></div><div><span class="cat-pill">${esc(it.cat)}</span></div><div class="gauge-wrap"><div class="gauge-top"><span class="gauge-num">${it.mode==='slider'?p+'%':it.qty+' / '+it.max}</span><span class="gauge-pct">${it.mode==='slider'?'reorder at '+it.min+'%':p+'% · reorder at '+it.min}</span></div><div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${p}"></div><div class="gauge-marker" data-marker="${mp}"></div></div></div><div><span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span></div><div class="row-actions"><button class="edit-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;row.addEventListener('click',()=>openEdit(it.id));dr.appendChild(row);});requestAnimationFrame(()=>{dr.querySelectorAll('.gauge-fill').forEach(g=>{requestAnimationFrame(()=>{g.style.width=g.dataset.target+'%';});});dr.querySelectorAll('.gauge-marker').forEach(m=>{requestAnimationFrame(()=>{m.style.left=m.dataset.marker+'%';});});});document.getElementById('addToLocBtn').onclick=()=>{openAdd();setTimeout(()=>{document.getElementById('f-loc').value=loc;},350);};}
 document.getElementById('openAdd').addEventListener('click',openAdd);
 document.getElementById('closePanel').addEventListener('click',closePanel);
 document.getElementById('cancelBtn').addEventListener('click',closePanel);

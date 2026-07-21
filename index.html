@@ -346,15 +346,15 @@ function renderList(filtered,q=''){
     const low=isLow(it),p=pct(it),mp=minPct(it);
     const row=document.createElement('div');
     row.className='row';row.style.animationDelay=(idx*35)+'ms';row.dataset.id=it.id;
-    row.innerHTML=`
-      <div class="item-name-cell"><div class="item-name">${esc(it.name)}</div><div class="item-loc">${esc(it.loc)}</div></div>
-      <div><span class="cat-pill">${esc(it.cat)}</span></div>
+    row.innerHTML='`
+      <div class="item-name-cell"><div class="item-name">'+(esc(it.name))+'</div><div class="item-loc">'+(esc(it.loc))+'</div></div>
+      <div><span class="cat-pill">'+(esc(it.cat))+'</span></div>
       <div class="gauge-wrap">
-        <div class="gauge-top"><span class="gauge-num">${it.mode==='slider'?p+'%':it.qty+' / '+it.max}</span><span class="gauge-pct">${it.mode==='slider'?'reorder at '+it.min+'%':p+'% · reorder at '+it.min}</span></div>
-        <div class="gauge"><div class="gauge-fill ${low?'low':''}" data-target="${p}"></div><div class="gauge-marker" data-marker="${mp}"></div></div>
+        <div class="gauge-top"><span class="gauge-num">'+(it.mode==='slider'?p+'%':it.qty+' / '+it.max)+'</span><span class="gauge-pct">'+(it.mode==='slider'?'reorder at '+it.min+'%':p+'% · reorder at '+it.min)+'</span></div>
+        <div class="gauge"><div class="gauge-fill '+(low?'low':'')+'" data-target="'+(p)+'"></div><div class="gauge-marker" data-marker="'+(mp)+'"></div></div>
       </div>
-      <div><span class="status ${low?'low':'ok'}"><span class="dot"></span>${low?'Reorder':'Stocked'}</span></div>
-      <div class="row-actions"><button class="edit-dot" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>`;
+      <div><span class="status '+(low?'low':'ok')+'"><span class="dot"></span>'+(low?'Reorder':'Stocked')+'</span></div>
+      <div class="row-actions"><button class="edit-dot" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>';
     row.addEventListener('click',()=>openEdit(it.id));
     rowsEl.appendChild(row);
   });

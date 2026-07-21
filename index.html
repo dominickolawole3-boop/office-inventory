@@ -240,14 +240,22 @@ function renderList(filtered,q){
 function showMainPage(){currentLocPage=null;["mainPage","locationsPage","locationDetailPage"].forEach(function(id){document.getElementById(id).classList.toggle("active",id==="mainPage");});}
 function showLocationsPage(){
   currentLocPage=null;
-  ["mainPage","locationsPage","locationDetailPage"].forEach(function(id){document.getElementById(id).classList.toggle("active",id==="locationsPage");});
+  ['mainPage','locationsPage','locationDetailPage'].forEach(function(id){document.getElementById(id).classList.toggle('active',id==='locationsPage');});
   var locs=Array.from(new Set(items.map(function(i){return i.loc;}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b);});
-  document.getElementById("locationGrid").innerHTML=locs.map(function(loc){
+  var grid=document.getElementById('locationGrid');
+  grid.innerHTML='';
+  locs.forEach(function(loc){
     var li=items.filter(function(i){return i.loc===loc;});
     var low=li.filter(isLow).length;
-    var safe=loc.replace(/\\/g,"\\\\").replace(/"/g,"&quot;");
-    return '<div class="loc-card" onclick="showLocationDetail(\"'+safe+'\")"><div class="loc-card-name">'+esc(loc)+'</div><div class="loc-card-count">'+li.length+' item'+(li.length!==1?"s":"")+'</div>'+(low?'<div class="loc-card-low">'+low+' need reorder</div>':"")+"</div>";
-  }).join("");
+    var card=document.createElement('div');
+    card.className='loc-card';
+    var nameEl=document.createElement('div');nameEl.className='loc-card-name';nameEl.textContent=loc;
+    var countEl=document.createElement('div');countEl.className='loc-card-count';countEl.textContent=li.length+' item'+(li.length!==1?'s':'');
+    card.appendChild(nameEl);card.appendChild(countEl);
+    if(low){var lowEl=document.createElement('div');lowEl.className='loc-card-low';lowEl.textContent=low+' need reorder';card.appendChild(lowEl);}
+    card.addEventListener('click',function(){showLocationDetail(loc);});
+    grid.appendChild(card);
+  });
 }
 function showLocationDetail(loc){
   currentLocPage=loc;

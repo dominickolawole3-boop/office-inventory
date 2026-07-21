@@ -226,7 +226,7 @@ function render(){
   document.getElementById("statTotal").textContent=items.length;
   document.getElementById("statLow").textContent=items.filter(isLow).length;
   document.getElementById("statCats").textContent=new Set(items.map(function(i){return i.cat;})).size;
-  document.getElementById("statLocs").textContent=new Set(items.map(function(i){return i.loc;}).filter(Boolean)).size;
+document.getElementById('statLocs').textContent=new Set(items.map(function(x){return topLoc(x.loc);}).filter(Boolean)).size;}).filter(Boolean)).size;
   filterItems();
 }
 function renderList(filtered,q){
@@ -259,7 +259,7 @@ function showLocationsPage(){
     var li=items.filter(function(i){return topLoc(i.loc)===off;});
     var subs=Array.from(new Set(li.map(function(i){return subLoc(i.loc);}).filter(Boolean)));
     var txt=li.length+' item'+(li.length!==1?'s':'');
-    if(subs.length)txt+=' \u00b7 '+subs.length+' workstation'+(subs.length!==1?'s':'');
+    if(subs.length)txt+=' - '+subs.length+' workstation'+(subs.length!==1?'s':'');
     grid.appendChild(makeLocCard(off,txt,li.filter(isLow).length,function(){showLocationDetail(off);}));
   });
 }
@@ -288,7 +288,7 @@ function showLocationDetail(loc){
   }
   var li=items.filter(function(i){return i.loc===loc;}).slice().sort(function(a,b){return isLow(b)-isLow(a);});
   var lowCount=li.filter(isLow).length;
-  document.getElementById('detailLocCount').textContent=li.length+' item'+(li.length!==1?'s':'')+(lowCount?' \u00b7 '+lowCount+' need reorder':'');
+  document.getElementById('detailLocCount').textContent=li.length+' item'+(li.length!==1?'s':'')+(lowCount?' - '+lowCount+' need reorder':'');
   document.getElementById('detailEmpty').style.display=li.length?'none':'block';
   var dr=document.getElementById('detailRows');dr.innerHTML='';
   li.forEach(function(it,idx){dr.appendChild(makeRow(it,idx));});

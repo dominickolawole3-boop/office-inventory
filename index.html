@@ -136,13 +136,14 @@ input[type=range]:hover::-webkit-slider-thumb{background:var(--slate);}
 <div class="loc-grid" id="locationGrid"></div>
 </div>
 <div id="locationDetailPage" class="page">
-<div class="breadcrumb"><span class="bc-back" onclick="showLocationsPage()">Locations</span><span class="bc-sep">›</span><span class="bc-cur" id="detailLocName"></span></div>
+<div class="breadcrumb" id="detailCrumb"><span class="bc-back" onclick="showLocationsPage()">Locations</span><span class="bc-sep">›</span><span class="bc-cur" id="detailLocName"></span></div>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
 <span style="font-size:13px;color:var(--ink-soft);" id="detailLocCount"></span>
 <button class="add-btn" id="addToLocBtn" style="padding:10px 16px;font-size:13px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add item here</button>
 </div>
 <div class="list-head" style="margin-bottom:8px;"><div>Item</div><div>Category</div><div>Stock</div><div>Status</div><div></div></div>
-<div id="detailRows"></div>
+<div class="loc-grid" id="detailSubGrid" style="margin-bottom:18px;"></div>
+  <div id="detailRows"></div>
 <div class="empty" id="detailEmpty" style="display:none;">No items in this location yet.</div>
 </div></div>
 <div class="toast" id="toast"></div>
@@ -238,38 +239,61 @@ function renderList(filtered,q){
   animateGauges(rowsEl);
 }
 function showMainPage(){currentLocPage=null;["mainPage","locationsPage","locationDetailPage"].forEach(function(id){document.getElementById(id).classList.toggle("active",id==="mainPage");});}
+function topLoc(l){var p=String(l||'').split(' / ');return p[0];}
+function subLoc(l){var p=String(l||'').split(' / ');return p.length>1?p[1]:null;}
+function makeLocCard(title,count,low,onClick){
+  var card=document.createElement('div');card.className='loc-card';
+  var n=document.createElement('div');n.className='loc-card-name';n.textContent=title;card.appendChild(n);
+  var c=document.createElement('div');c.className='loc-card-count';c.textContent=count;card.appendChild(c);
+  if(low){var lo=document.createElement('div');lo.className='loc-card-low';lo.textContent=low+' need reorder';card.appendChild(lo);}
+  card.addEventListener('click',onClick);
+  return card;
+}
 function showLocationsPage(){
   currentLocPage=null;
   ['mainPage','locationsPage','locationDetailPage'].forEach(function(id){document.getElementById(id).classList.toggle('active',id==='locationsPage');});
-  var locs=Array.from(new Set(items.map(function(i){return i.loc;}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b);});
+  var offices=Array.from(new Set(items.map(function(i){return topLoc(i.loc);}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b);});
   var grid=document.getElementById('locationGrid');
   grid.innerHTML='';
-  locs.forEach(function(loc){
-    var li=items.filter(function(i){return i.loc===loc;});
-    var low=li.filter(isLow).length;
-    var card=document.createElement('div');
-    card.className='loc-card';
-    var nameEl=document.createElement('div');nameEl.className='loc-card-name';nameEl.textContent=loc;
-    var countEl=document.createElement('div');countEl.className='loc-card-count';countEl.textContent=li.length+' item'+(li.length!==1?'s':'');
-    card.appendChild(nameEl);card.appendChild(countEl);
-    if(low){var lowEl=document.createElement('div');lowEl.className='loc-card-low';lowEl.textContent=low+' need reorder';card.appendChild(lowEl);}
-    card.addEventListener('click',function(){showLocationDetail(loc);});
-    grid.appendChild(card);
+  offices.forEach(function(off){
+    var li=items.filter(function(i){return topLoc(i.loc)===off;});
+    var subs=Array.from(new Set(li.map(function(i){return subLoc(i.loc);}).filter(Boolean)));
+    var txt=li.length+' item'+(li.length!==1?'s':'');
+    if(subs.length)txt+=' \u00b7 '+subs.length+' workstation'+(subs.length!==1?'s':'');
+    grid.appendChild(makeLocCard(off,txt,li.filter(isLow).length,function(){showLocationDetail(off);}));
   });
 }
 function showLocationDetail(loc){
   currentLocPage=loc;
-  ["mainPage","locationsPage","locationDetailPage"].forEach(function(id){document.getElementById(id).classList.toggle("active",id==="locationDetailPage");});
-  document.getElementById("detailLocName").textContent=loc;
+  ['mainPage','locationsPage','locationDetailPage'].forEach(function(id){document.getElementById(id).classList.toggle('active',id==='locationDetailPage');});
+  var sub=subLoc(loc), top=topLoc(loc);
+  var crumb=document.getElementById('detailCrumb');
+  crumb.innerHTML='';
+  var b1=document.createElement('span');b1.className='bc-back';b1.textContent='Locations';b1.addEventListener('click',showLocationsPage);crumb.appendChild(b1);
+  if(sub){
+    var s1=document.createElement('span');s1.className='bc-sep';s1.textContent='>';crumb.appendChild(s1);
+    var b2=document.createElement('span');b2.className='bc-back';b2.textContent=top;b2.addEventListener('click',function(){showLocationDetail(top);});crumb.appendChild(b2);
+  }
+  var s2=document.createElement('span');s2.className='bc-sep';s2.textContent='>';crumb.appendChild(s2);
+  var cur=document.createElement('span');cur.className='bc-cur';cur.textContent=sub||loc;crumb.appendChild(cur);
+  var sg=document.getElementById('detailSubGrid');
+  sg.innerHTML='';
+  if(!sub){
+    var subs=Array.from(new Set(items.filter(function(i){return topLoc(i.loc)===loc&&subLoc(i.loc);}).map(function(i){return subLoc(i.loc);}))).sort();
+    subs.forEach(function(s){
+      var full=loc+' / '+s;
+      var sl=items.filter(function(i){return i.loc===full;});
+      sg.appendChild(makeLocCard(s,sl.length+' item'+(sl.length!==1?'s':''),sl.filter(isLow).length,function(){showLocationDetail(full);}));
+    });
+  }
   var li=items.filter(function(i){return i.loc===loc;}).slice().sort(function(a,b){return isLow(b)-isLow(a);});
   var lowCount=li.filter(isLow).length;
-  document.getElementById("detailLocCount").textContent=li.length+" item"+(li.length!==1?"s":"")+(lowCount?" · "+lowCount+" need reorder":"");
-  document.getElementById("detailEmpty").style.display=li.length?"none":"block";
-  var dr=document.getElementById("detailRows");
-  dr.innerHTML="";
+  document.getElementById('detailLocCount').textContent=li.length+' item'+(li.length!==1?'s':'')+(lowCount?' \u00b7 '+lowCount+' need reorder':'');
+  document.getElementById('detailEmpty').style.display=li.length?'none':'block';
+  var dr=document.getElementById('detailRows');dr.innerHTML='';
   li.forEach(function(it,idx){dr.appendChild(makeRow(it,idx));});
   animateGauges(dr);
-  document.getElementById("addToLocBtn").onclick=function(){openAdd();setTimeout(function(){document.getElementById("f-loc").value=loc;},350);};
+  document.getElementById('addToLocBtn').onclick=function(){openAdd();setTimeout(function(){document.getElementById('f-loc').value=loc;},350);};
 }
 function openPanel(){document.getElementById("overlay").classList.add("show");document.getElementById("panel").classList.add("show");}
 function closePanel(){document.getElementById("overlay").classList.remove("show");document.getElementById("panel").classList.remove("show");editingId=null;}

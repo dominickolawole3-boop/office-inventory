@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
-<title>Supply Room â Inventory</title>
+<title>Supply Room Ã¢ÂÂ Inventory</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,650&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -100,43 +100,65 @@ input[type=range]:hover::-webkit-slider-thumb{background:var(--slate);}
 <div class="help-modal hidden" id="helpModal">
 <div class="help-backdrop" onclick="document.getElementById('helpModal').classList.add('hidden')"></div>
 <div class="help-box"><button class="help-close" onclick="document.getElementById('helpModal').classList.add('hidden')">&times;</button>
-<h2>Quick Guide</h2><h3>Adding an Item</h3><ul>
-<li>Click <strong>+ Add item</strong> in the top right</li>
-<li>Enter the item name, category, and where it's stored</li>
-<li>Choose <strong>Count</strong> or <strong>Slider</strong> mode</li>
-<li>Click <strong>Save item</strong> â saves to the shared sheet instantly</li>
-</ul><h3>Finding an Item</h3><ul>
-<li>Type in the <strong>search bar</strong> at the top of the list</li>
-<li>Search works by item name, category, or location</li>
-<li>Items needing reorder appear <strong>at the top</strong> in amber</li>
-</ul><h3>Editing an Item</h3><ul>
-<li>Click anywhere on the item row to open the edit panel</li>
-<li>Update any field and click <strong>Save changes</strong></li>
-<li>Click <strong>Remove</strong> to delete an item</li>
-</ul></div></div>
+<h2>Quick Guide</h2>
+    <h3>Adding an Item</h3>
+    <ul>
+      <li>Click <strong>+ Add item</strong> in the top right</li>
+      <li>Enter the item name and pick a category</li>
+      <li>Click the <strong>Location</strong> box to pick from the saved list, or type a new one</li>
+      <li>Choose <strong>Count</strong> or <strong>Slider</strong> (see below), then click <strong>Save item</strong></li>
+      <li>If the same item already exists in that location you will get a warning instead of a duplicate</li>
+    </ul>
+    <h3>Count vs Slider</h3>
+    <ul>
+      <li><strong>Count</strong> &ndash; for things you can count. Enter current qty, max qty, and the reorder number</li>
+      <li><strong>Slider</strong> &ndash; for things that are a hassle to count (cleaning fluid, coffee). Just drag to roughly how full it is</li>
+      <li>You pick per item, and it stays on that setting when you reopen it</li>
+    </ul>
+    <h3>Finding an Item</h3>
+    <ul>
+      <li>Type in the <strong>search bar</strong> &ndash; it matches item name, category, or location</li>
+      <li>Anything at or below its reorder level jumps to the <strong>top of the list</strong> in amber</li>
+    </ul>
+    <h3>Browsing by Location</h3>
+    <ul>
+      <li>Click the <strong>locations</strong> tile in the header to see every office</li>
+      <li>Click an office to see what is in it. Offices with workstations show them as cards at the top</li>
+      <li>Click a workstation card to see just that person&rsquo;s kit</li>
+      <li>Use the trail at the top (Locations &rsaquo; Office &rsaquo; Workstation) to step back up</li>
+      <li><strong>Add item here</strong> adds straight into whichever office or workstation you are viewing</li>
+    </ul>
+    <h3>Editing an Item</h3>
+    <ul>
+      <li>Click anywhere on the item row to open the edit panel</li>
+      <li>Update any field and click <strong>Save changes</strong> &ndash; everyone sees it straight away</li>
+      <li>To remove an item entirely click <strong>Remove</strong> at the bottom</li>
+    </ul>
+  </div>
+</div>
 <div class="wrap">
 <div class="top"><div><h1>Office Inventory</h1><p class="sub">What's on the shelf, what's running low, and where to find it.</p></div>
 <button class="add-btn" id="openAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add item</button></div>
 <div class="stats">
-<div class="stat"><div class="n" id="statTotal">â</div><div class="l">items tracked</div></div>
-<div class="stat low"><div class="n" id="statLow">â</div><div class="l">running low</div></div>
-<div class="stat"><div class="n" id="statCats">â</div><div class="l">categories</div></div>
-<div class="stat clickable" onclick="showLocationsPage()"><div class="n" id="statLocs">â</div><div class="l">locations</div></div>
+<div class="stat"><div class="n" id="statTotal">Ã¢ÂÂ</div><div class="l">items tracked</div></div>
+<div class="stat low"><div class="n" id="statLow">Ã¢ÂÂ</div><div class="l">running low</div></div>
+<div class="stat"><div class="n" id="statCats">Ã¢ÂÂ</div><div class="l">categories</div></div>
+<div class="stat clickable" onclick="showLocationsPage()"><div class="n" id="statLocs">Ã¢ÂÂ</div><div class="l">locations</div></div>
 </div>
 <div id="mainPage" class="page active">
 <div class="search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-<input id="searchInput" type="text" placeholder="Search items, categories, locationsâ¦" oninput="debounceFilter()"></div>
+<input id="searchInput" type="text" placeholder="Search items, categories, locationsÃ¢ÂÂ¦" oninput="debounceFilter()"></div>
 <div class="list-head"><div>Item</div><div>Category</div><div>Stock</div><div>Status</div><div></div></div>
 <div id="rows"><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div></div>
-<div class="empty" id="emptyState" style="display:none;">No items yet â add your first one.</div>
+<div class="empty" id="emptyState" style="display:none;">No items yet Ã¢ÂÂ add your first one.</div>
 </div>
 <div id="locationsPage" class="page">
-<div class="breadcrumb"><span class="bc-back" onclick="showMainPage()">â Back to inventory</span></div>
+<div class="breadcrumb"><span class="bc-back" onclick="showMainPage()">Ã¢ÂÂ Back to inventory</span></div>
 <h2 style="font-family:Fraunces,serif;font-weight:560;font-size:30px;margin:0 0 24px;">All Locations</h2>
 <div class="loc-grid" id="locationGrid"></div>
 </div>
 <div id="locationDetailPage" class="page">
-<div class="breadcrumb" id="detailCrumb"><span class="bc-back" onclick="showLocationsPage()">Locations</span><span class="bc-sep">âº</span><span class="bc-cur" id="detailLocName"></span></div>
+<div class="breadcrumb" id="detailCrumb"><span class="bc-back" onclick="showLocationsPage()">Locations</span><span class="bc-sep">Ã¢ÂÂº</span><span class="bc-cur" id="detailLocName"></span></div>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
 <span style="font-size:13px;color:var(--ink-soft);" id="detailLocCount"></span>
 <button class="add-btn" id="addToLocBtn" style="padding:10px 16px;font-size:13px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add item here</button>
@@ -190,10 +212,10 @@ function debounceFilter(){clearTimeout(_ft);_ft=setTimeout(filterItems,180);}
 function setMode(m){currentMode=m;document.getElementById("countFields").style.display=m==="count"?"":"none";document.getElementById("sliderFields").style.display=m==="slider"?"":"none";document.getElementById("modeCount").classList.toggle("active",m==="count");document.getElementById("modeSlider").classList.toggle("active",m==="slider");}
 function updateSliderDisplay(){document.getElementById("sliderValDisplay").textContent=document.getElementById("f-slider-qty").value+"%";}
 function updateSliderMinDisplay(){document.getElementById("sliderMinDisplay").textContent=document.getElementById("f-slider-min").value+"%";}
-function updatePreview(){var qty=parseInt(document.getElementById("f-qty").value||"0",10),max=parseInt(document.getElementById("f-max").value||"0",10),el=document.getElementById("pctPreview");el.textContent=max>0?"â "+Math.round((qty/max)*100)+"% full ("+qty+" of "+max+")":" ";}
+function updatePreview(){var qty=parseInt(document.getElementById("f-qty").value||"0",10),max=parseInt(document.getElementById("f-max").value||"0",10),el=document.getElementById("pctPreview");el.textContent=max>0?"Ã¢ÂÂ "+Math.round((qty/max)*100)+"% full ("+qty+" of "+max+")":" ";}
 function updateLocationList(){var fromItems=items.map(function(i){return i.loc;}).filter(Boolean);var seen=new Map();DEFAULT_LOCATIONS.concat(fromItems).forEach(function(l){var k=l.toLowerCase().replace(/\s+/g," ").trim();if(!seen.has(k))seen.set(k,l);});var all=Array.from(seen.values()).sort(function(a,b){return a.localeCompare(b);});var dl=document.getElementById("locationList");dl.innerHTML=all.map(function(l){return"<option value=\""+l.replace(/"/g,"&quot;")+"\">"; }).join("");}
 window.addEventListener("DOMContentLoaded",function(){loadItems();document.getElementById("f-qty").addEventListener("input",updatePreview);document.getElementById("f-max").addEventListener("input",updatePreview);});
-async function loadItems(){try{var res=await fetch(SCRIPT_URL);var data=await res.json();if(!data.ok)throw new Error(data.error);items=data.items.map(function(i){return{id:Number(i.id),name:i.name,cat:i.cat,loc:i.loc,qty:Number(i.qty),max:Number(i.max)||100,min:Number(i.min),mode:i.mode||"count"};});updateLocationList();render();}catch(e){showToast("Could not load data â try refreshing",true);document.getElementById("rows").innerHTML="";document.getElementById("emptyState").style.display="block";document.getElementById("emptyState").textContent="Failed to load â please refresh.";}}
+async function loadItems(){try{var res=await fetch(SCRIPT_URL);var data=await res.json();if(!data.ok)throw new Error(data.error);items=data.items.map(function(i){return{id:Number(i.id),name:i.name,cat:i.cat,loc:i.loc,qty:Number(i.qty),max:Number(i.max)||100,min:Number(i.min),mode:i.mode||"count"};});updateLocationList();render();}catch(e){showToast("Could not load data Ã¢ÂÂ try refreshing",true);document.getElementById("rows").innerHTML="";document.getElementById("emptyState").style.display="block";document.getElementById("emptyState").textContent="Failed to load Ã¢ÂÂ please refresh.";}}
 async function apiPost(action,item){var res=await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:action,item:item})});return res.json();}
 function pct(it){return Math.max(0,Math.min(100,Math.round((it.qty/it.max)*100)));}
 function minPct(it){return Math.max(0,Math.min(100,Math.round((it.min/it.max)*100)));}
@@ -206,7 +228,7 @@ function makeRow(it,idx){
   row.style.animationDelay=(idx*35)+"ms";
   row.dataset.id=it.id;
   var stockStr=it.mode==="slider"?p+"%":it.qty+" / "+it.max;
-  var reorderStr=it.mode==="slider"?"reorder at "+it.min+"%":p+"% Â· reorder at "+it.min;
+  var reorderStr=it.mode==="slider"?"reorder at "+it.min+"%":p+"% ÃÂ· reorder at "+it.min;
   var statusCls=low?"low":"ok";
   var statusTxt=low?"Reorder":"Stocked";
   var fillCls="gauge-fill"+(low?" low":"");
@@ -299,9 +321,9 @@ function openPanel(){document.getElementById("overlay").classList.add("show");do
 function closePanel(){document.getElementById("overlay").classList.remove("show");document.getElementById("panel").classList.remove("show");editingId=null;}
 function openAdd(){editingId=null;document.getElementById("panelTitle").textContent="Add item";document.getElementById("panelSub").textContent="New entry for the supply room";document.getElementById("deleteBtn").style.display="none";document.getElementById("saveBtn").textContent="Save item";document.getElementById("itemForm").reset();document.getElementById("pctPreview").textContent="";document.getElementById("f-slider-qty").value=100;updateSliderDisplay();document.getElementById("f-slider-min").value=25;updateSliderMinDisplay();setMode("count");openPanel();setTimeout(function(){document.getElementById("f-name").focus();},300);}
 function openEdit(id){var it=items.find(function(i){return i.id===id;});if(!it)return;editingId=id;document.getElementById("panelTitle").textContent="Edit item";document.getElementById("panelSub").textContent=it.name;document.getElementById("deleteBtn").style.display="block";document.getElementById("saveBtn").textContent="Save changes";document.getElementById("f-name").value=it.name;document.getElementById("f-cat").value=it.cat;document.getElementById("f-loc").value=it.loc;if(it.mode==="slider"){setMode("slider");document.getElementById("f-slider-qty").value=it.qty;updateSliderDisplay();document.getElementById("f-slider-min").value=it.min;updateSliderMinDisplay();}else{setMode("count");document.getElementById("f-qty").value=it.qty;document.getElementById("f-max").value=it.max;document.getElementById("f-min").value=it.min;updatePreview();}openPanel();}
-async function save(){if(busy)return;var name=document.getElementById("f-name").value.trim(),cat=document.getElementById("f-cat").value,loc=document.getElementById("f-loc").value.trim();if(!name||!loc){document.getElementById("f-name").focus();return;}var norm=function(s){return s.toLowerCase().replace(/\s+/g,"");};var dup=items.find(function(i){return norm(i.name)===norm(name)&&norm(i.loc)===norm(loc)&&i.id!==editingId;});if(dup){showToast("â ï¸ \""+name+"\" already exists in "+loc,true);return;}var qty,max,min,mode;if(currentMode==="slider"){qty=parseInt(document.getElementById("f-slider-qty").value,10);max=100;min=parseInt(document.getElementById("f-slider-min").value,10);mode="slider";}else{qty=Math.max(0,parseInt(document.getElementById("f-qty").value||"0",10));max=Math.max(1,parseInt(document.getElementById("f-max").value||"1",10));min=Math.max(0,parseInt(document.getElementById("f-min").value||"0",10));mode="count";}setBusy(true);try{if(editingId){await apiPost("edit",{id:editingId,name:name,cat:cat,loc:loc,qty:qty,max:max,min:min,mode:mode});Object.assign(items.find(function(i){return i.id===editingId;}),{name:name,cat:cat,loc:loc,qty:qty,max:max,min:min,mode:mode});showToast("Changes saved â");}else{var res=await apiPost("add",{name:name,cat:cat,loc:loc,qty:qty,max:max,min:min,mode:mode});items.unshift({id:res.id,name:name,cat:cat,loc:loc,qty:qty,max:max,min:min,mode:mode});showToast("Item added â");}updateLocationList();closePanel();if(currentLocPage)showLocationDetail(currentLocPage);else render();}catch(e){showToast("Save failed â try again",true);}setBusy(false);}
-async function remove(){if(busy||!editingId)return;setBusy(true);try{await apiPost("delete",{id:editingId});var el=document.querySelector(".row[data-id=\""+editingId+"\"]");items=items.filter(function(i){return i.id!==editingId;});closePanel();if(el){el.classList.add("leaving");setTimeout(function(){if(currentLocPage)showLocationDetail(currentLocPage);else render();},260);}else{if(currentLocPage)showLocationDetail(currentLocPage);else render();}showToast("Item removed");}catch(e){showToast("Delete failed â try again",true);}setBusy(false);}
-function setBusy(b){busy=b;["saveBtn","deleteBtn","cancelBtn"].forEach(function(id){var el=document.getElementById(id);if(el)el.disabled=b;});document.getElementById("saveBtn").textContent=b?"Savingâ¦":(editingId?"Save changes":"Save item");}
+async function save(){if(busy)return;var name=document.getElementById("f-name").value.trim(),cat=document.getElementById("f-cat").value,loc=document.getElementById("f-loc").value.trim();if(!name||!loc){document.getElementById("f-name").focus();return;}var norm=function(s){return s.toLowerCase().replace(/\s+/g,"");};var dup=items.find(function(i){return norm(i.name)===norm(name)&&norm(i.loc)===norm(loc)&&i.id!==editingId;});if(dup){showToast("Ã¢ÂÂ Ã¯Â¸Â \""+name+"\" already exists in "+loc,true);return;}var qty,max,min,mode;if(currentMode==="slider"){qty=parseInt(document.getElementById("f-slider-qty").value,10);max=100;min=parseInt(document.getElementById("f-slider-min").value,10);mode="slider";}else{qty=Math.max(0,parseInt(document.getElementById("f-qty").value||"0",10));max=Math.max(1,parseInt(document.getElementById("f-max").value||"1",10));min=Math.max(0,parseInt(document.getElementById("f-min").value||"0",10));mode="count";}setBusy(true);try{if(editingId){await apiPost("edit",{id:editingId,name:name,cat:cat,loc:loc,qty:qty,max:max,min:min,mode:mode});Object.assign(items.find(function(i){return i.id===editingId;}),{name:name,cat:cat,loc:loc,qty:qty,max:max,min:min,mode:mode});showToast("Changes saved Ã¢ÂÂ");}else{var res=await apiPost("add",{name:name,cat:cat,loc:loc,qty:qty,max:max,min:min,mode:mode});items.unshift({id:res.id,name:name,cat:cat,loc:loc,qty:qty,max:max,min:min,mode:mode});showToast("Item added Ã¢ÂÂ");}updateLocationList();closePanel();if(currentLocPage)showLocationDetail(currentLocPage);else render();}catch(e){showToast("Save failed Ã¢ÂÂ try again",true);}setBusy(false);}
+async function remove(){if(busy||!editingId)return;setBusy(true);try{await apiPost("delete",{id:editingId});var el=document.querySelector(".row[data-id=\""+editingId+"\"]");items=items.filter(function(i){return i.id!==editingId;});closePanel();if(el){el.classList.add("leaving");setTimeout(function(){if(currentLocPage)showLocationDetail(currentLocPage);else render();},260);}else{if(currentLocPage)showLocationDetail(currentLocPage);else render();}showToast("Item removed");}catch(e){showToast("Delete failed Ã¢ÂÂ try again",true);}setBusy(false);}
+function setBusy(b){busy=b;["saveBtn","deleteBtn","cancelBtn"].forEach(function(id){var el=document.getElementById(id);if(el)el.disabled=b;});document.getElementById("saveBtn").textContent=b?"SavingÃ¢ÂÂ¦":(editingId?"Save changes":"Save item");}
 var toastTimer;function showToast(msg,isErr){var t=document.getElementById("toast");t.textContent=msg;t.className="toast"+(isErr?" err":"");requestAnimationFrame(function(){t.classList.add("show");});clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove("show");},3000);}
 document.getElementById("openAdd").addEventListener("click",openAdd);
 document.getElementById("closePanel").addEventListener("click",closePanel);

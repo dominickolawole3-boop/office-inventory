@@ -206,7 +206,7 @@ input[type=range]:hover::-webkit-slider-thumb{background:var(--slate);}
 </div></div>
 <script>
 var SCRIPT_URL="https://script.google.com/macros/s/AKfycbzaesjanebel3Fj8pfa-Y24uzqVByw4O0jSeRXlzPvRREjXRAkAHtVbxJj3902qiRZb1g/exec";
-var DEFAULT_LOCATIONS=["Cab A","Caitlyn's office","Dave's office","Dorothy's office","Downstairs kitchen","Heather and Patricia's office","Jess's office","Kitchen","Lobby","Malavika and Andrea's office","Maritza's office","Murray's office","Olivia and Bogic's office","Reception","Sujany and Daniela's office","Upstairs kitchen"];
+var DEFAULT_LOCATIONS=["Cab A","Caitlyn's office","Dave's office","Dorothy's office","Downstairs kitchen","Heather and Patricia's office","Heather and Patricia's office / Heather's workstation","Heather and Patricia's office / Patricia's workstation","Jess's office","Kitchen","Lobby","Malavika and Andrea's office","Maritza's office","Murray's office","Olivia and Bogic's office","Olivia and Bogic's office / Olivia's workstation","Olivia and Bogic's office / Bogic's workstation","Reception","Sujany and Daniela's office","Upstairs kitchen"];
 var items=[],editingId=null,busy=false,currentMode="count",currentLocPage=null,_ft=null;
 function debounceFilter(){clearTimeout(_ft);_ft=setTimeout(filterItems,180);}
 function setMode(m){currentMode=m;document.getElementById("countFields").style.display=m==="count"?"":"none";document.getElementById("sliderFields").style.display=m==="slider"?"":"none";document.getElementById("modeCount").classList.toggle("active",m==="count");document.getElementById("modeSlider").classList.toggle("active",m==="slider");}
@@ -249,7 +249,7 @@ function render(){
   document.getElementById('statTotal').textContent=items.length;
   document.getElementById('statLow').textContent=items.filter(isLow).length;
   document.getElementById('statCats').textContent=new Set(items.map(function(x){return x.cat;})).size;
-  document.getElementById('statLocs').textContent=new Set(items.map(function(x){return topLoc(x.loc);}).filter(Boolean)).size;
+  document.getElementById('statLocs').textContent=new Set(DEFAULT_LOCATIONS.concat(items.map(function(x){return x.loc;})).map(function(l){return topLoc(l);}).filter(Boolean)).size;
 }
 function renderList(filtered,q){
   var rowsEl=document.getElementById("rows");
@@ -274,7 +274,7 @@ function makeLocCard(title,count,low,onClick){
 function showLocationsPage(){
   currentLocPage=null;
   ['mainPage','locationsPage','locationDetailPage'].forEach(function(id){document.getElementById(id).classList.toggle('active',id==='locationsPage');});
-  var offices=Array.from(new Set(items.map(function(i){return topLoc(i.loc);}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b);});
+  var allLocs=DEFAULT_LOCATIONS.concat(items.map(function(i){return i.loc;}));var offices=Array.from(new Set(allLocs.map(function(l){return topLoc(l);}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b);});
   var grid=document.getElementById('locationGrid');
   grid.innerHTML='';
   offices.forEach(function(off){
@@ -301,7 +301,7 @@ function showLocationDetail(loc){
   var sg=document.getElementById('detailSubGrid');
   sg.innerHTML='';
   if(!sub){
-    var subs=Array.from(new Set(items.filter(function(i){return topLoc(i.loc)===loc&&subLoc(i.loc);}).map(function(i){return subLoc(i.loc);}))).sort();
+    var pool=DEFAULT_LOCATIONS.concat(items.map(function(i){return i.loc;}));var subs=Array.from(new Set(pool.filter(function(l){return topLoc(l)===loc&&subLoc(l);}).map(function(l){return subLoc(l);}))).sort();
     subs.forEach(function(s){
       var full=loc+' / '+s;
       var sl=items.filter(function(i){return i.loc===full;});
